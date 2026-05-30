@@ -1,0 +1,9 @@
+data/
+checkpoints/
+code/adaworld/
+*.pyc
+__pycache__/
+.venv/
+*.tar
+*.mp4
+*.png

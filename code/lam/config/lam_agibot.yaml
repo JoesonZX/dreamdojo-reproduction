@@ -1,0 +1,64 @@
+# LAM training config for AgiBot-World Alpha on 4x RTX 6000 Ada
+# Based on DreamDojo paper hyperparameters (Sec 4.1 / Appendix)
+# Adapted to 3-GPU setup (GPU 0 occupied by nextgdt; use CUDA_VISIBLE_DEVICES=1,2,3)
+
+# ── Model ─────────────────────────────────────────────────────────────────────
+model:
+  # AdaWorld LatentActionModel parameters (passed to LAM Lightning wrapper)
+  image_channels: 3
+  lam_model_dim: 512          # AdaWorld default; DreamDojo paper uses 700M model
+                               # (larger: model_dim=1024, enc/dec_blocks=24)
+                               # Start with AdaWorld dims for faster iteration
+  lam_latent_dim: 32           # DreamDojo: 32-dim continuous latent action
+  lam_patch_size: 16
+  lam_enc_blocks: 8
+  lam_dec_blocks: 8
+  lam_num_heads: 8
+  lam_dropout: 0.0
+  beta: 1.0e-6                 # DreamDojo value (AdaWorld default=0.01, too large)
+  log_interval: 500
+  log_path: /home/xuan/embodied-ai/checkpoints/lam/log_imgs
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+data:
+  # Point to the extracted episodes root (after tar extraction).
+  # Layout: {data_root}/{task_id}/{ep_id}/videos/{camera}.mp4
+  data_root: /home/xuan/embodied-ai/data/agibotworld/extracted
+  camera: head_color           # Front-facing RGB camera (640x480, 30fps)
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2, 3, 4]
+  val_ratio: 0.05
+  seed: 42
+
+# ── Training ──────────────────────────────────────────────────────────────────
+training:
+  # Effective batch = per_gpu_batch_size * num_gpus * gradient_accumulation_steps
+  # = 32 * 3 * 3 ≈ 288  (close to paper's 256)
+  per_gpu_batch_size: 32
+  gradient_accumulation_steps: 3
+  num_workers: 8
+  pin_memory: true
+
+  total_steps: 100000          # Start with 100k; scale to 400k after validation
+  lr: 2.5e-5
+  weight_decay: 0.01
+  optimizer: adamw
+  lr_scheduler: cosine         # Cosine decay (no explicit mention in paper, standard)
+  warmup_steps: 1000
+
+  mixed_precision: bf16        # RTX 6000 Ada supports bf16
+
+  # Checkpointing
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam
+  save_every: 5000             # Save checkpoint every N steps
+  eval_every: 2000             # Run validation metrics every N steps
+  log_every: 100               # Log losses every N steps
+  keep_last_n: 3               # Keep only last N checkpoints to save disk
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  project: dreamdojo-lam
+  run_name: lam-agibot-100k
+  # Set WANDB_API_KEY env var or run `wandb login` before training
+  use_wandb: false             # Set to true if wandb is configured
