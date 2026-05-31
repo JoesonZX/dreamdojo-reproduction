@@ -1,7 +1,7 @@
-# DreamDojo Pipeline 理解：数据流与 Rollout 指南
+# DreamDojo Pipeline 理解：数据流
 
-**目标**：在动手训练之前，先理解数据长什么样、怎么流动、模型输出什么。  
-**计划顺序**：① 理解流程和数据 → ② Rollout 出结果看效果 → ③ 再做 Post-Training
+**目标**：理解数据长什么样、怎么流动、模型输出什么。  
+**Rollout 指南已移至**：`06-lam-rollout.md`
 
 ---
 
@@ -33,8 +33,7 @@
 ┌──────────────────────────┐
 │  Step 3: Post-Training   │  ← 之后做的
 │  输入: AgiBot 视频 +     │
-│        â_t（LAM提取）+   │
-│        关节角度 action   │
+│        真实关节角度 action│  ← ⚠️ 不用 LAM，用真实标注
 │  模型: Cosmos-Predict2.5 │
 │        2B（NVIDIA开源）  │
 │  输出: action-conditioned│
@@ -192,115 +191,12 @@ x_t（噪声 latent）
 
 ---
 
-## 3. Rollout 计划
-
-### Step 2a：LAM Rollout
-
-LAM 训练完后做的验证：给两帧，看重建质量。
-
-**目标**：验证 LAM 学到了有意义的 latent action（重建的 f_{t+1} 应该清晰、接近真实）。
-
-```python
-# 伪代码：LAM rollout
-model.eval()
-f_t   = load_frame(video, t)       # [1, 3, 240, 320]
-f_t1  = load_frame(video, t+1)     # ground truth
-
-batch = {"videos": torch.stack([f_t, f_t1], dim=1)}   # [1, 2, 240, 320, 3]
-with torch.no_grad():
-    out = model(batch)
-
-recon = out["recon"][0, 0]   # [240, 320, 3]  重建的 f_{t+1}
-mu    = out["z_mu"][0]        # [32]           latent action
-
-# 可视化：左=f_t，中=f_{t+1}真实，右=重建
-show_comparison(f_t, f_t1, recon)
-```
-
-**期望看到的**：重建帧与真实帧视觉上接近，PSNR ≥ 20 dB。
-
----
-
-### Step 2b：Cosmos-Predict2.5 Zero-Shot Rollout
-
-在做 Post-Training 之前，先看 Cosmos-Predict2.5 **原始模型**（未 post-train）的表现，建立 baseline。
-
-**为什么要做**：
-- 知道 post-training 前后的差距有多大
-- 确认 Cosmos 环境配置正确
-- 熟悉推理 API
-
-**推理流程**（无动作条件）：
-```
-condition frame (f_0)
-        │
-        ▼
-  Cosmos-Predict2.5-2B
-  （zero-shot，无动作条件）
-        │
-        ▼
-  生成的未来 12 帧
-```
-
-**需要的资源**：
-- Cosmos-Predict2.5-2B 权重（NVIDIA 开源，约 15GB）
-- 单卡推理需要约 20-30GB VRAM → GPU 1/2/3 任意一张可以
-
-**rollout 命令**（待配置 Cosmos 环境后填写）：
-```bash
-# TODO: 配置 Cosmos-Predict2.5 环境后补充
-# 参考: https://github.com/nvidia/Cosmos
-```
-
----
-
-### Step 2b 的预期效果对比
-
-| 模型 | 动作条件 | 预期表现 |
-|------|---------|---------|
-| Cosmos-Predict2.5（zero-shot）| 无 | 生成"合理但不受控"的未来帧，动作随机 |
-| DreamDojo（post-train 后）| 有（latent/真实动作）| 生成"跟随动作指令"的未来帧，可控 |
-
-这个对比就是论文 Table 2 里 "action-free" vs "latent action" 的直观体现。
-
----
-
-## 4. 当前已有数据汇总
+## 3. 当前数据状态（2026-05-27）
 
 ```
-/home/xuan/embodied-ai/data/agibotworld/
-├── observations/                  ← 原始 tar 文件
-│   ├── 359/648638-681118.tar      46GB，220 episodes（待解压）
-│   ├── 362/649552-654138.tar      46GB，220 episodes（待解压）
-│   └── 410/686871-686871.tar      198MB，1 episode（已解压）
-└── extracted/                     ← 解压 + 转码后
-    ├── 359/（162 episodes 已解压，部分完成）
-    ├── 410/686871/videos/head_color.mp4   ← h264，已验证可读
-    └── 362/（待解压）
-```
-
-**数据量评估**：
-- 当前可用：~163 episodes，约 20 万帧对
-- 目标：解压 362 后达到 ~383 episodes，约 55 万帧对
-- 帧对足够做 100k 步 LAM 训练（约 52 遍数据）
-
----
-
-## 5. 下一步行动顺序
-
-```
-现在   →  等待 preprocess_videos.py 完成（解压+转码 362 tar，约 1-2 小时）
-            │
-            ▼
-Step 1  →  LAM 正式训练（100k steps，约 8-12 小时，tmux 后台）
-            │
-            ▼
-Step 2a →  LAM Rollout：给视频帧对，可视化重建质量
-            │
-            ▼
-Step 2b →  配置 Cosmos-Predict2.5 环境，做 zero-shot rollout
-            (下载 2B 权重 ~15GB，配置推理脚本)
-            │
-            ▼
-Step 3  →  Post-Training：用 AgiBot 关节数据 fine-tune Cosmos
+extracted/
+├── 359/  ← 约 220 episodes，已解压转码
+├── 362/  ← 约 220 episodes，已解压转码
+└── 410/  ← 1 episode（测试用）
+共 441 个 head_color.mp4，LAM 训练已使用
 ```

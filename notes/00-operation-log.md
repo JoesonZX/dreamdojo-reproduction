@@ -293,6 +293,117 @@ CUDA_VISIBLE_DEVICES=1 /home/xuan/.venv/bin/python eval_lam.py \
 
 ---
 
+## 阶段 5：LAM Rollout 评估（2026-05-27）
+
+```bash
+cd /home/xuan/embodied-ai/code/lam
+
+# 定量评估（PSNR）
+CUDA_VISIBLE_DEVICES=1 /home/xuan/.venv/bin/python eval_lam.py \
+    --checkpoint /home/xuan/embodied-ai/checkpoints/lam/step_0100000 \
+    --config config/lam_agibot.yaml \
+    --mode reconstruction \
+    --n_samples 500
+# 结果: MSE=0.000206, PSNR=36.86 dB（过拟合，原因是数据循环约 86 遍）
+```
+
+可视化对比图（手动脚本，取 12 个不同场景样本）：
+```
+输出: checkpoints/lam/rollout_imgs/lam_rollout_grid.png
+      checkpoints/lam/rollout_imgs/sample_XX_psnrXX.X.png（共 12 张）
+格式: f_t（输入）| f_{t+1} GT | recon（LAM 重建）
+```
+
+**结果摘要**：
+- 整体 PSNR 36.86 dB，过拟合（训练数据循环约 86 遍）
+- 运动幅度最大的样本 PSNR 24.7 dB，接近正常泛化范围
+- 重建图视觉清晰，LAM 功能正常，pipeline 验证成功
+- 详细分析见 `06-lam-rollout.md`
+
+---
+
+## 阶段 6：整理结果目录 + Cosmos 环境配置（2026-05-31）
+
+### 结果目录整理
+
+```bash
+# 新建 results 目录，将 LAM rollout 图片移入
+mkdir -p /home/xuan/embodied-ai/results/lam-rollout
+mkdir -p /home/xuan/embodied-ai/results/cosmos-rollout
+mv /home/xuan/embodied-ai/checkpoints/lam/rollout_imgs/* \
+   /home/xuan/embodied-ai/results/lam-rollout/
+```
+
+### 安装 uv 包管理器
+
+Cosmos-Predict2.5 使用 `uv` 管理依赖，不支持标准 pip 安装：
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc
+```
+
+### 克隆 Cosmos-Predict2.5 仓库
+
+```bash
+cd /home/xuan/embodied-ai/code
+git clone https://github.com/nvidia-cosmos/cosmos-predict2.5.git cosmos-predict25
+cd cosmos-predict25
+```
+
+### 安装依赖（指定 Python 3.10）
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+# 必须指定 --python 3.10，否则 uv 默认用 Python 3.13，flash-attn 不兼容
+uv sync --extra=cu128 --python 3.10
+```
+
+验证：
+```bash
+.venv/bin/python -c "import torch; print(torch.__version__)"
+# 输出: 2.7.0+cu128
+```
+
+### 准备推理输入
+
+```bash
+# 提取 AgiBot 视频第一帧作为 conditioning frame
+ffmpeg -i /home/xuan/embodied-ai/data/agibotworld/extracted/362/649552/videos/head_color.mp4 \
+    -vframes 1 /home/xuan/embodied-ai/results/cosmos-rollout/cond_frame.jpg -y
+
+# 创建推理 JSON
+cat > /home/xuan/embodied-ai/results/cosmos-rollout/agibot_input.json << 'EOF'
+{
+    "inference_type": "image2world",
+    "name": "agibot_zero_shot",
+    "prompt": "A robot arm performing a manipulation task on a table",
+    "input_path": "/home/xuan/embodied-ai/results/cosmos-rollout/cond_frame.jpg"
+}
+EOF
+```
+
+### 启动 Zero-Shot 推理
+
+```bash
+cd /home/xuan/embodied-ai/code/cosmos-predict25
+export PATH="$HOME/.local/bin:$PATH"
+
+# 在 tmux 中运行（预计 30-90 分钟）
+tmux new-session -s cosmos
+
+CUDA_VISIBLE_DEVICES=1 .venv/bin/python examples/inference.py \
+    -i /home/xuan/embodied-ai/results/cosmos-rollout/agibot_input.json \
+    -o /home/xuan/embodied-ai/results/cosmos-rollout/ \
+    --inference-type=image2world \
+    --model=2B/pre-trained \
+    --disable-guardrails
+```
+
+模型权重（tokenizer.pth、ema_bf16.pt、Cosmos-Reason1-7B）在首次运行时自动下载到 `~/.cache/huggingface/`。
+
+---
+
 ## 当前状态
 
 | 步骤 | 状态 |
@@ -301,11 +412,11 @@ CUDA_VISIBLE_DEVICES=1 /home/xuan/.venv/bin/python eval_lam.py \
 | Python 环境（.venv）配置 | ✅ |
 | AdaWorld 克隆 | ✅ |
 | LAM 训练代码编写 | ✅ |
-| task 410 数据下载 + 解压 + 转码 | ✅ |
-| task 362 tar 下载（1 个）| ✅ |
-| task 359 tar 下载（1 个）| ✅ |
-| task 359/362 解压 + 转码 | 🔄 进行中（preprocess_videos.py）|
-| Pipeline 验证（dry run + 小数据）| ✅ |
-| 正式 100k 步训练 | ⏳ 等待预处理完成 |
-| LAM 质量评估 | ⏳ |
-| 下一阶段：世界模型后训练 | ⏳ |
+| task 410/359/362 数据下载 + 解压 + 转码 | ✅ 共 441 episodes |
+| Pipeline 验证（dry run）| ✅ |
+| LAM 100k 步正式训练 | ✅ |
+| LAM Rollout 评估 | ✅ PSNR 36.86 dB（过拟合，pipeline 正常）|
+| 结果目录整理（results/）| ✅ |
+| Cosmos-Predict2.5 环境配置 | ✅ PyTorch 2.7+cu128 |
+| Cosmos Zero-Shot 推理 | 🔄 进行中（tmux: cosmos）|
+| Post-Training（Cosmos + AgiBot 关节数据）| ⏳ |

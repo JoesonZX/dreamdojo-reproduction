@@ -1,0 +1,6 @@
+{
+    "inference_type": "image2world",
+    "name": "agibot_zero_shot",
+    "prompt": "A robot arm performing a manipulation task on a table",
+    "input_path": "/home/xuan/embodied-ai/results/cosmos-rollout/cond_frame.jpg"
+}

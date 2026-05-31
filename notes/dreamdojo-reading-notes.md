@@ -71,6 +71,8 @@ $$\mathcal{L}^{\text{pred}}_{\theta,\varphi}(f^{t+1}) = \mathbb{E}_{q_\varphi(\h
 
 $\beta = 10^{-6}$，信息瓶颈强迫模型压缩出最关键的动作信息，自然实现跨具身迁移。
 
+**LAM 训练数据**：人类视频（In-lab 55h + EgoDex 829h + DreamDojo-HV 43,827h）**以及**机器人视频（G1、GR-1、AgiBot、YAM）。LAM 不是只用人类视频训练，机器人数据也参与。
+
 **关键发现**：在第一人称人类视频中，这个 embedding 特别能捕捉手部/肢体动作，且不同具身执行相似动作时 latent action 相似（见论文 Figure 3）。
 
 ### 2.4 架构改进：动作注入方式
@@ -226,10 +228,13 @@ $$\mathcal{L}_{\text{distill}} = D_{KL}(p_{\text{teacher}} \| p_{\text{student}}
 | EgoDex | 人类（Apple Vision Pro） | 829h | 公开 |
 | In-lab | 人类（Manus 手套 + Vive Tracker） | 55h | 未公开 |
 | DreamDojo-HV | 人类（众包） | 43,827h | 未公开 |
-| AgiBot-World | 机器人 | 2.9k h / 1M 轨迹 | 公开（alpha版）|
+| AgiBot-World | 机器人（LAM训练 + 后训练） | 2.9k h / 1M 轨迹 | 公开（alpha版）|
 | DROID | 机器人 | 350h | 公开 |
 
-**复现可行数据组合**：EgoDex（公开）+ AgiBot-World alpha（公开）+ 自采 In-lab（可选）。
+> ⚠️ **重要说明**：论文中的 AgiBot 数据是作者内部采集的 in-house 数据，与公开的 AgiBot-World Alpha 数据集不完全相同。公开 Alpha 版在论文 Table 1 中仅作为对比 baseline 引用。
+
+**复现可行数据组合**：EgoDex（公开，用于 LAM）+ AgiBot-World alpha（公开，用于 LAM 和后训练）。
+- LAM 训练：AgiBot 视频即可（论文也用了机器人视频），没有 DreamDojo-HV 会影响跨具身泛化，但不影响 Post-Training 效果。
 
 ### 6.2 模型组件
 

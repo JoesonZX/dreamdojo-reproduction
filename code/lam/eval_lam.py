@@ -51,8 +51,11 @@ def load_model(checkpoint_dir: str, cfg: dict, device: torch.device) -> LatentAc
         if not candidates:
             raise FileNotFoundError(f"No model weights found in {checkpoint_dir}")
         model_bin = candidates[0]
-    state_dict = torch.load(model_bin, map_location="cpu")
-    # Accelerate may wrap keys with "module." prefix under DDP
+    if str(model_bin).endswith(".safetensors"):
+        from safetensors.torch import load_file
+        state_dict = load_file(str(model_bin), device="cpu")
+    else:
+        state_dict = torch.load(model_bin, map_location="cpu")
     if any(k.startswith("module.") for k in state_dict):
         state_dict = {k.replace("module.", "", 1): v for k, v in state_dict.items()}
     model.load_state_dict(state_dict, strict=True)

@@ -309,16 +309,112 @@ hf download --type dataset \
 
 ---
 
-## 当前状态（2026-05-27）
+## 问题7：eval_lam.py 无法加载 safetensors 格式 checkpoint
+
+### 现象
+```
+KeyError: 'unexpected key in state dict'
+# 或 RuntimeError: PytorchStreamReader failed
+```
+
+Accelerate 保存的 checkpoint 为 `model.safetensors`，而 `eval_lam.py` 原先用 `torch.load()` 加载，对 safetensors 格式报错。
+
+### 解决方案
+在 `eval_lam.py` 的 `load_model` 函数中，按文件扩展名选择加载方式：
+
+```python
+if str(model_bin).endswith(".safetensors"):
+    from safetensors.torch import load_file
+    state_dict = load_file(str(model_bin), device="cpu")
+else:
+    state_dict = torch.load(model_bin, map_location="cpu")
+```
+
+`safetensors` 库已在 `.venv` 中安装（v0.7.0），无需额外安装。
+
+---
+
+## 问题8：Cosmos-Predict2.5 使用 uv 安装，Python 版本冲突
+
+### 现象
+```
+error: Distribution `flash-attn==2.7.3+cu128.torch27` can't be installed
+hint: You're using CPython 3.13, but flash-attn only has wheels for: cp310
+```
+
+`uv sync --extra=cu128` 默认选择系统最新 Python（3.13），但 `flash-attn` 只提供 Python 3.10 的 wheel。
+
+### 解决方案
+强制指定 Python 3.10：
+```bash
+uv sync --extra=cu128 --python 3.10
+```
+
+验证：
+```bash
+.venv/bin/python --version   # Python 3.10.x
+.venv/bin/python -c "import torch; print(torch.__version__)"  # 2.7.0+cu128
+```
+
+---
+
+## 问题9：Cosmos 推理时 `uvx hf` 调用下载失败（Access denied）
+
+### 现象
+```
+subprocess.CalledProcessError: Command '['uvx', 'hf>=1.3.5', 'download',
+'nvidia/Cosmos-Predict2.5-2B', ..., 'tokenizer.pth']' returned non-zero exit status 1.
+```
+
+推理脚本内部通过 `subprocess` 调用 `uvx hf download` 下载权重，`uvx` 运行的是独立隔离环境，**不会继承当前 shell 的 HuggingFace token**，导致访问被拒绝（即使已用 `hf auth login` 登录）。
+
+### 分析过程
+直接用 `hf download` 命令手动下载是成功的（token 读取正常）。说明问题不是权限申请未通过，而是 `uvx` 的隔离机制导致 token 丢失。
+
+### 解决方案
+**首次运行前，手动预下载所有必要权重**：
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+# image2world 2B/pre-trained 需要的三个组件：
+
+# 1. VAE tokenizer
+hf download --type model \
+    --revision f176dc95b4a70f53ce01c4b302851595e7322b00 \
+    nvidia/Cosmos-Predict2.5-2B tokenizer.pth
+
+# 2. 主模型权重（在推理时自动触发下载，第一次成功后缓存）
+# 3. Text encoder（Cosmos-Reason1-7B，同上）
+```
+
+预下载后文件缓存在 `~/.cache/huggingface/`，再次运行时 `uvx hf download` 检测到缓存直接返回路径，不需要重新下载和认证。
+
+### 额外问题：Cosmos-Guardrail1 同样是 gated model
+
+推理流程还会尝试下载 `Cosmos-Guardrail1`（内容安全审核模型），该模型同样是 gated，且对研究用途不必要。
+
+**解决方案**：加 `--disable-guardrails` 参数跳过：
+```bash
+CUDA_VISIBLE_DEVICES=1 .venv/bin/python examples/inference.py \
+    -i input.json \
+    -o output/ \
+    --inference-type=image2world \
+    --model=2B/pre-trained \
+    --disable-guardrails   # ← 跳过 Guardrail 下载
+```
+
+---
+
+## 当前状态（2026-05-31）
 
 - [x] 环境配置完成（`.venv` 中有所有依赖）
 - [x] AdaWorld 代码克隆并验证可用
 - [x] 数据集代码适配 AgiBot 实际格式
 - [x] AV1 转码方案验证
-- [x] dry run 通过（5 steps）
-- [x] pipeline 验证训练完成（1 个视频，已收敛）
-- [x] 磁盘清理完成（释放 800GB，现余 843GB）
-- [x] task 362（220 episodes）+ task 359（220 episodes）tar 已就位
-- [ ] 解压 + 转码两个 46GB tar（运行 preprocess_videos.py，约 1-2 小时）
-- [ ] 用 440 个 episode 正式启动 100k 步训练
-- [ ] 验证 LAM 质量（PSNR ≥ 20 dB）
+- [x] LAM 100k 步训练完成
+- [x] LAM Rollout 完成（PSNR 36.86 dB，过拟合，pipeline 正常）
+- [x] 结果整理到 `results/` 目录
+- [x] Cosmos-Predict2.5 环境配置完成（PyTorch 2.7+cu128）
+- [x] Cosmos 推理问题排查完成
+- [ ] Cosmos Zero-Shot Rollout 完成（推理中）
+- [ ] Post-Training
