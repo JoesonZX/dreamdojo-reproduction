@@ -293,7 +293,7 @@ CUDA_VISIBLE_DEVICES=1 /home/xuan/.venv/bin/python eval_lam.py \
 
 ---
 
-## 阶段 5：LAM Rollout 评估（2026-05-27）
+## 阶段 5：LAM Rollout 评估（2026-05-31）
 
 ```bash
 cd /home/xuan/embodied-ai/code/lam
@@ -418,5 +418,7 @@ CUDA_VISIBLE_DEVICES=1 .venv/bin/python examples/inference.py \
 | LAM Rollout 评估 | ✅ PSNR 36.86 dB（过拟合，pipeline 正常）|
 | 结果目录整理（results/）| ✅ |
 | Cosmos-Predict2.5 环境配置 | ✅ PyTorch 2.7+cu128 |
-| Cosmos Zero-Shot 推理 | 🔄 进行中（tmux: cosmos）|
-| Post-Training（Cosmos + AgiBot 关节数据）| ⏳ |
+| Cosmos Zero-Shot Rollout | ✅ 约 40 分钟，结果见 results/cosmos-rollout/ |
+| Post-Training 调研 | ✅ 数据格式差异已确认，见 08-post-training.md |
+| Post-Training 数据转换脚本 | ⏳ |
+| Post-Training 训练 | ⏳ |

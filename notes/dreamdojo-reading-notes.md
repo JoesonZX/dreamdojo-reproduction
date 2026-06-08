@@ -60,38 +60,161 @@ $$\mathcal{L}_{\text{flow}}(\theta) = \mathbb{E}_{x,\epsilon,c,t} \| u(x_t, t, c
 
 **核心思想**：用一个信息瓶颈 VAE 从相邻帧对中提取"动作"，不需要任何人工标注。
 
-**架构**：
-- 700M 参数的时空 Transformer（Spatiotemporal Transformer）
-- 编码器：输入连续两帧 $f_t, f_{t+1}$，输出 32 维连续潜在动作 $\hat{a}_t$
-- 解码器：输入 $\hat{a}_t$ + $f_t$，重建 $f_{t+1}$
+#### 2.3.1 整体架构
 
-**损失函数**：
+700M 参数的 Spatiotemporal Transformer VAE，分为编码器和解码器两部分：
 
-$$\mathcal{L}^{\text{pred}}_{\theta,\varphi}(f^{t+1}) = \mathbb{E}_{q_\varphi(\hat{a}|f^{t:t+1})} \log p_\theta(f^{t+1}|\hat{a}, f^t) - \beta D_{KL}(q_\varphi(\hat{a}|f^{t:t+1}) \| p(\hat{a}))$$
+```
+输入: [f_t, f_{t+1}]（连续两帧，各 320×240）
+           │
+    ┌──────┴──────────────────────────────────┐
+    │           编码器（24层 ST-Transformer）   │
+    │                                          │
+    │  1. 把两帧都切成 16×16 的 patch           │
+    │     每帧: 15×20 = 300 个 patch            │
+    │                                          │
+    │  2. 在每帧的 patch 序列前加一个            │
+    │     可学习的 action_prompt token          │
+    │     → [action | p1 | p2 | ... | p300]    │
+    │                                          │
+    │  3. Spatiotemporal Attention：            │
+    │     - 空间 attention：同一帧内的 patch 互看  │
+    │     - 时间 attention：同位置 patch 跨帧互看  │
+    │                                          │
+    │  4. 只取第2帧（f_{t+1}）的 action token    │
+    │     → Linear → [μ, log σ²]（各32维）      │
+    └──────────────────────────────────────────┘
+                    │
+                    │ 重参数化：â_t = μ + σ·ε（ε~N(0,I)）
+                    ↓
+              â_t（32维 latent action）
+                    │
+    ┌───────────────┴──────────────────────────┐
+    │           解码器（24层 SpatioTransformer）  │
+    │                                          │
+    │  1. 只输入 f_t 的 patch（不含 f_{t+1}）   │
+    │     → Linear 投影到 model_dim            │
+    │                                          │
+    │  2. â_t → Linear 投影到 model_dim         │
+    │     与 f_t patches 相加（加法融合）        │
+    │                                          │
+    │  3. Spatial Attention（只做空间，不跨帧）  │
+    │                                          │
+    │  4. 反 patchify → 重建 f_{t+1}            │
+    │     → Sigmoid 归一化到 [0,1]             │
+    └──────────────────────────────────────────┘
+                    │
+              重建的 f_{t+1}
+```
 
-$\beta = 10^{-6}$，信息瓶颈强迫模型压缩出最关键的动作信息，自然实现跨具身迁移。
+**关键设计：为什么 action token 能捕获"动作"？**
 
-**LAM 训练数据**：人类视频（In-lab 55h + EgoDex 829h + DreamDojo-HV 43,827h）**以及**机器人视频（G1、GR-1、AgiBot、YAM）。LAM 不是只用人类视频训练，机器人数据也参与。
+编码器同时看到 $f_t$ 和 $f_{t+1}$，两帧之间的差异通过 temporal attention 传递到 action token。解码器只拿到 $f_t$，它需要依赖 $\hat{a}_t$ 才能重建出 $f_{t+1}$——因此 $\hat{a}_t$ 被迫编码所有"从 $f_t$ 变化到 $f_{t+1}$ 所需的信息"，即动作。
 
-**关键发现**：在第一人称人类视频中，这个 embedding 特别能捕捉手部/肢体动作，且不同具身执行相似动作时 latent action 相似（见论文 Figure 3）。
+**信息瓶颈的作用**：32 维 + KL 惩罚（β=1e-6）强迫模型丢弃无关信息（背景、光照），只压缩运动相关的核心信息。β 极小意味着约束很宽松，允许模型保留较多信息，但"变化到下一帧"这个任务自然引导模型关注运动。
 
-### 2.4 架构改进：动作注入方式
+#### 2.3.2 与 AdaWorld 实现的对应关系
 
-**改进1：相对动作（Relative Actions）**
+DreamDojo 论文的 LAM 架构与 AdaWorld（ICML 2025）一致，AdaWorld 代码已开源。实际实现中（见 `adaworld/lam/lam/modules/lam.py`）：
 
-原始绝对关节姿态 → 以每个 latent frame 开始的姿态为基准做差，转为相对动作。
+- 编码器用 `SpatioTemporalTransformer`（同时做空间和时间 attention）
+- 解码器用 `SpatioTransformer`（只做空间 attention，因为解码时只有单帧）
+- action token 通过 `nn.Parameter` 定义为可学习的 action_prompt
+- 解码时用**加法融合**：`video_patches + action_patches`（而非 cross-attention）
 
-- 相对动作分布更集中（窄），模型更易学习
-- 增强对连续、组合动作的泛化能力
+论文用 700M（24层×2），AdaWorld 默认配置是 60M（8层×2）。我们使用 AdaWorld 的小模型进行复现。
 
-**改进2：Chunked 动作注入**
+#### 2.3.3 损失函数详解
 
-由于 tokenizer 时序压缩比为 4，将 4 个连续动作 $a_{t:t+4}$ 拼接成一个 chunk，注入对应的 latent frame。
+$$\mathcal{L} = \underbrace{\|f_{t+1} - \hat{f}_{t+1}\|^2}_{\text{重建损失（MSE）}} + \beta \underbrace{D_{KL}(q(\hat{a}|f^{t:t+1}) \| \mathcal{N}(0,I))}_{\text{KL 散度}}$$
 
-- 满足因果性：当前帧只看当前动作，不看未来动作
-- 显著减少因果混淆（causality confusion），提升学习效率
+KL 散度展开为：
+$$D_{KL} = -\frac{1}{2}\sum_{j=1}^{32}(1 + \log\sigma_j^2 - \mu_j^2 - \sigma_j^2)$$
 
-**动作条件注入方式**：将动作通过轻量 MLP 投影到与 timestep embedding 相同的维度，叠加后输入 DiT block 的自适应层归一化（AdaLN）。MLP 最后一层初始化为全零（zero initialization）以稳定早期训练。
+- $\beta = 10^{-6}$：极小，KL 约束很弱，主要靠重建损失驱动
+- 训练时采样（随机性），推理时只用 μ（确定性）
+
+**LAM 训练数据**：人类视频（In-lab 55h + EgoDex 829h + DreamDojo-HV 43,827h）**以及**机器人视频（G1、GR-1、AgiBot、YAM）。LAM 不只用人类视频，机器人数据也参与。
+
+**关键发现**：不同具身执行相似动作时 latent action 相似（见论文 Figure 3），说明信息瓶颈成功剥离了具身外观信息。
+
+### 2.4 世界模型的动作注入与初始化
+
+#### 2.4.1 动作如何注入 Cosmos-Predict2.5
+
+Cosmos-Predict2.5 是 DiT（Diffusion Transformer）架构，每个 DiT block 通过 AdaLN（Adaptive Layer Normalization）接受条件信号。
+
+动作注入的路径：
+
+```
+â_t 或真实关节角度
+        │
+        │ Action MLP（轻量3层 MLP）
+        ↓
+action_embed（与 timestep_embed 同维度）
+        │
+        + （加法，不是 concat）
+        │
+timestep_embed + action_embed
+        │
+        ↓
+      AdaLN
+  ┌────┴────┐
+scale    shift     → 调制每个 DiT block 的 LayerNorm
+```
+
+动作和时间步共享同一个 AdaLN 入口，而文本通过独立的 cross-attention 注入。这意味着动作对模型的影响方式和"当前去噪步骤"是类似的——都是全局调制整个特征图的尺度和偏移。
+
+#### 2.4.2 Action MLP 的两阶段初始化策略
+
+这是 DreamDojo 的一个关键工程细节：
+
+**预训练阶段（用 latent action）**：
+- MLP 最后一层权重和偏置全部初始化为 **0**
+- 效果：训练开始时 action_embed = 0，对模型的扰动为零
+- 原因：Cosmos-Predict2.5 已经预训练好了，如果一开始 action 注入随机噪声，会破坏预训练的物理知识，导致训练不稳定
+- 随着训练进行，MLP 逐渐学会产生有意义的 action_embed
+
+**Post-Training 阶段（换用真实关节角度）**：
+- MLP **第一层**重新初始化（随机初始化）
+- MLP **最后一层**保留零初始化
+- 原因：从 32 维 latent action 切换到 56 维真实关节角度（4 chunk × 14 DoF），输入维度完全不同，第一层必须重建映射；但最后一层仍保持零初始化以稳定切换初期的训练
+
+```python
+# 预训练时
+nn.init.zeros_(action_mlp[-1].weight)
+nn.init.zeros_(action_mlp[-1].bias)
+
+# Post-Training 时
+nn.init.kaiming_normal_(action_mlp[0].weight)  # 第一层重新初始化
+nn.init.zeros_(action_mlp[-1].weight)           # 最后一层仍为零
+nn.init.zeros_(action_mlp[-1].bias)
+```
+
+#### 2.4.3 Chunked 动作注入
+
+WAN2.1 tokenizer（Cosmos-Predict2.5 使用，注：原笔记写 WAN2.2，实为 WAN2.1）时序压缩比为 4：每个 latent frame $x^i$ 对应像素空间的 4 帧 $f_{4i:4i+4}$。
+
+动作注入需要与 latent frame 对齐：
+- 将 4 个连续原始动作 $a_{4i:4i+4}$ 拼接成一个 chunk
+- 每个 latent frame 注入对应的 action chunk
+- 这样 latent frame 只看"自己对应时间段"的动作，不跨帧
+
+**为什么不能全局广播一个动作？** 如果把序列平均动作注入所有 latent frame，模型无法区分"哪个时间段发生了什么"，导致因果混淆（causality confusion）——模型分不清是哪个动作导致了哪个帧的变化。
+
+#### 2.4.4 相对动作（Relative Actions）
+
+原始数据是绝对关节角度（从零点量起的绝对值），训练时转换为相对动作：
+
+```python
+# 每 4 个时间步为一个 chunk，以 chunk 起始姿态为基准
+for i in range(0, T, 4):
+    baseline = abs_actions[i]          # chunk 起点的绝对姿态
+    chunk = abs_actions[i:i+4] - baseline  # 相对位移
+    rel_actions.append(chunk.flatten())    # [4 * 14DoF = 56维]
+```
+
+相对动作的分布比绝对动作窄得多（绝对值可能跨越整个关节范围，相对值集中在小范围内），更易于 MLP 学习。
 
 ### 2.5 训练目标：时序一致性损失
 

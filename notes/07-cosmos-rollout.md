@@ -97,11 +97,13 @@ cd /home/xuan/embodied-ai/code/cosmos-predict25
 source .venv/bin/activate
 
 # Zero-shot image2world（无动作条件）
-CUDA_VISIBLE_DEVICES=1 python examples/inference.py \
+# 注意：--model 必须是 '2B/pre-trained'，不能只写 '2B'
+CUDA_VISIBLE_DEVICES=1 .venv/bin/python examples/inference.py \
     -i /home/xuan/embodied-ai/results/cosmos-rollout/agibot_input.json \
     -o /home/xuan/embodied-ai/results/cosmos-rollout/ \
     --inference-type=image2world \
-    --model=2B
+    --model=2B/pre-trained \
+    --disable-guardrails
 ```
 
 **预计推理时间**：RTX 6000 Ada 48GB，估计 30-90 分钟/clip（参考：L40S 约 43分钟）
@@ -119,14 +121,30 @@ CUDA_VISIBLE_DEVICES=1 python examples/inference.py \
 
 ---
 
-## 结果记录
+## 结果记录（2026-05-31）
 
-> 待填写（推理完成后更新）
+- **推理时间**：约 40 分钟（CUDA_VISIBLE_DEVICES=1，RTX 6000 Ada 48GB）
+- **输出视频**：`results/cosmos-rollout/agibot_zero_shot.mp4`（5.81秒，1280×704，16fps）
+- **条件帧**：AgiBot task 362，机器人双臂抓取布袋，俯视视角，蓝灰色桌布
 
-- 推理时间：
-- 输出视频：`results/cosmos-rollout/agibot_zero_shot.mp4`
-- 视觉观察：
-- 与 Post-Training 后的对比：（Post-Training 完成后补充）
+**视觉观察**：
+
+| 帧 | 观察 |
+|----|------|
+| frame_01（条件帧附近）| 机器人双臂抓住布袋两侧，布袋平铺在桌面 |
+| frame_02（中段）| 布袋开始被抬起，出现折叠形变 |
+| frame_03（后段）| 布袋明显被提起，形变更大 |
+| frame_04（末尾）| 布袋完全折叠，背景已漂移为灰白色 |
+
+**关键发现**：
+- ✅ 物理理解正确：模型生成了"布袋被抬起折叠"的合理动作序列
+- ✅ 机器人结构保持：双臂位置在整个序列中基本合理
+- ⚠️ 背景颜色漂移：蓝灰色桌布 → 灰白色背景（zero-shot 典型问题，模型倾向于"常见背景"）
+- ⚠️ 动作不受控：没有动作条件，生成的动作是模型"猜测"的合理动作而非指定动作
+
+**与 Post-Training 后的对比**：
+- 颜色漂移问题应在 post-training 后消失（模型见过 AgiBot 的蓝灰桌布）
+- 动作可控性是 post-training 的核心目标（给定关节角度应能预测对应帧）
 
 ---
 

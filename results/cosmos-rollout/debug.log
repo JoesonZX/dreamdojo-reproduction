@@ -334,3 +334,6 @@
 [05-31 05:30:37|INFO|cosmos_predict2/_src/predict2/inference/video2world.py:538:generate_vid2world] Processing image input: /home/xuan/embodied-ai/results/cosmos-rollout/cond_frame.jpg
 [05-31 05:30:38|INFO|cosmos_predict2/_src/predict2/inference/video2world.py:576:generate_vid2world] GPU memory usage after getting data_batch: 19.80 GB
 [05-31 05:30:38|INFO|cosmos_predict2/_src/predict2/inference/video2world.py:614:generate_vid2world] [Memory Optimization] Starting latent sample generation
+[05-31 05:48:46|WARNING|cosmos_predict2/inference.py:167:_generate_sample] Guardrail checks on video are disabled
+[05-31 05:48:48|DEBUG|cosmos_predict2/_src/imaginaire/utils/easy_io/handlers/imageio_video_handler.py:163:dump_to_fileobj] mimsave_kwargs: {'fps': 16, 'quality': 5, 'macro_block_size': 1, 'ffmpeg_params': ['-s', '1280x704'], 'output_params': ['-f', 'mp4']}
+[05-31 05:48:49|SUCCESS|cosmos_predict2/inference.py:170:_generate_sample] Saved video to /home/xuan/embodied-ai/results/cosmos-rollout/agibot_zero_shot.mp4

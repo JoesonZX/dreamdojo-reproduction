@@ -1,0 +1,54 @@
+# LAM training config — 700M baseline (DreamDojo paper scale)
+# Train from scratch, used as the clean baseline for the foreground experiment.
+#
+# Usage:
+#   CUDA_VISIBLE_DEVICES=1,2,3 accelerate launch \
+#       --num_processes 3 --mixed_precision bf16 \
+#       /home/xuan/embodied-ai/code/lam/train_lam.py \
+#       --config /home/xuan/embodied-ai/code/lam/config/lam_agibot_700m.yaml
+
+model:
+  image_channels: 3
+  lam_model_dim: 1024          # 512 → 1024 (DreamDojo scale)
+  lam_latent_dim: 32
+  lam_patch_size: 16
+  lam_enc_blocks: 24           # 8 → 24
+  lam_dec_blocks: 24           # 8 → 24
+  lam_num_heads: 16            # 8 → 16
+  lam_dropout: 0.0
+  beta: 1.0e-6
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-700m/log_imgs
+
+data:
+  data_root: /home/xuan/embodied-ai/data/agibotworld/extracted
+  camera: head_color
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2, 3, 4]
+  val_ratio: 0.05
+  seed: 42
+
+training:
+  # 700M model needs smaller per-gpu batch to fit VRAM
+  # Effective batch ≈ 16 * 3 * 6 = 288 (matches paper's 256)
+  per_gpu_batch_size: 16
+  gradient_accumulation_steps: 6
+  num_workers: 8
+  pin_memory: true
+
+  total_steps: 150000          # Enough for t-SNE; paper uses 400k
+  lr: 2.5e-5
+  weight_decay: 0.01
+  warmup_steps: 1000
+  mixed_precision: bf16
+
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-700m
+  save_every: 5000
+  eval_every: 2000
+  log_every: 100
+  keep_last_n: 3
+
+logging:
+  project: dreamdojo-lam
+  run_name: lam-700m-baseline
+  use_wandb: false

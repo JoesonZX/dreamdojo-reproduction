@@ -159,7 +159,7 @@ ls /home/xuan/embodied-ai/checkpoints/lam/step_0100000/
 
 ---
 
-## 实际结果（2026-05-27）
+## 实际结果（2026-05-31）
 
 ### 定量评估
 

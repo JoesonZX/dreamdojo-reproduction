@@ -6,14 +6,12 @@
 model:
   # AdaWorld LatentActionModel parameters (passed to LAM Lightning wrapper)
   image_channels: 3
-  lam_model_dim: 512          # AdaWorld default; DreamDojo paper uses 700M model
-                               # (larger: model_dim=1024, enc/dec_blocks=24)
-                               # Start with AdaWorld dims for faster iteration
+  lam_model_dim: 1024          # DreamDojo 700M scale
   lam_latent_dim: 32           # DreamDojo: 32-dim continuous latent action
   lam_patch_size: 16
-  lam_enc_blocks: 8
-  lam_dec_blocks: 8
-  lam_num_heads: 8
+  lam_enc_blocks: 24           # DreamDojo 700M scale
+  lam_dec_blocks: 24           # DreamDojo 700M scale
+  lam_num_heads: 16            # DreamDojo 700M scale
   lam_dropout: 0.0
   beta: 1.0e-6                 # DreamDojo value (AdaWorld default=0.01, too large)
   log_interval: 500
@@ -35,30 +33,34 @@ data:
 training:
   # Effective batch = per_gpu_batch_size * num_gpus * gradient_accumulation_steps
   # = 32 * 3 * 3 ≈ 288  (close to paper's 256)
-  per_gpu_batch_size: 32
-  gradient_accumulation_steps: 3
+  per_gpu_batch_size: 16       # 减半，700M 模型显存占用更大
+  gradient_accumulation_steps: 6  # 维持 effective batch ~288
   num_workers: 8
   pin_memory: true
 
-  total_steps: 100000          # Start with 100k; scale to 400k after validation
-  lr: 2.5e-5
+  total_steps: 20000           # fine-tune: 10k baseline + 10k more with fg loss
+  lr: 1.0e-5                   # lower lr for fine-tuning
   weight_decay: 0.01
   optimizer: adamw
-  lr_scheduler: cosine         # Cosine decay (no explicit mention in paper, standard)
-  warmup_steps: 1000
+  lr_scheduler: cosine
+  warmup_steps: 200            # short warmup for fine-tune
 
-  mixed_precision: bf16        # RTX 6000 Ada supports bf16
+  mixed_precision: bf16
 
   # Checkpointing
-  output_dir: /home/xuan/embodied-ai/checkpoints/lam
-  save_every: 5000             # Save checkpoint every N steps
-  eval_every: 2000             # Run validation metrics every N steps
-  log_every: 100               # Log losses every N steps
-  keep_last_n: 3               # Keep only last N checkpoints to save disk
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-700m-fg
+  save_every: 2000
+  eval_every: 1000
+  log_every: 100
+  keep_last_n: 3
+
+# ── Foreground loss ────────────────────────────────────────────────────────────
+foreground:
+  use_fg_loss: true
+  fg_weight: 5.0               # foreground pixels get 5x reconstruction loss weight
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging:
   project: dreamdojo-lam
-  run_name: lam-agibot-100k
-  # Set WANDB_API_KEY env var or run `wandb login` before training
-  use_wandb: false             # Set to true if wandb is configured
+  run_name: lam-agibot-700m-fg-10k
+  use_wandb: false

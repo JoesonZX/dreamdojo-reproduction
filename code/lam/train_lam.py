@@ -45,16 +45,28 @@ from accelerate.utils import set_seed
 # Loss
 # ─────────────────────────────────────────────────────────────────────────────
 
-def lam_loss(outputs: dict, gt_future: torch.Tensor, beta: float):
+def lam_loss(
+    outputs: dict,
+    gt_future: torch.Tensor,
+    beta: float,
+    fg_mask: "torch.Tensor | None" = None,
+    fg_weight: float = 5.0,
+):
     """
-    VAE loss: MSE reconstruction + β * KL divergence.
+    VAE loss: (optionally foreground-weighted) MSE + β * KL divergence.
 
     outputs["recon"]: [B, T-1, H, W, C] predicted future frames
     gt_future:        [B, T-1, H, W, C] ground-truth future frames
-    outputs["z_mu"]:  [B*(T-1), latent_dim]
-    outputs["z_var"]: [B*(T-1), latent_dim]  (log-variance)
+    fg_mask:          [B, H, W] bool — True = foreground pixel (optional)
+    fg_weight:        loss multiplier for foreground pixels (default 5)
     """
-    mse = ((gt_future - outputs["recon"]) ** 2).mean()
+    err = (gt_future - outputs["recon"]) ** 2  # [B, T-1, H, W, C]
+    if fg_mask is not None:
+        # Broadcast mask: [B, H, W] → [B, 1, H, W, 1]
+        w = 1.0 + (fg_weight - 1.0) * fg_mask.float().unsqueeze(1).unsqueeze(-1)
+        mse = (w * err).mean()
+    else:
+        mse = err.mean()
     # KL( N(mu, exp(var)) || N(0,1) )
     kl = -0.5 * torch.sum(
         1 + outputs["z_var"] - outputs["z_mu"] ** 2 - outputs["z_var"].exp(),
@@ -101,6 +113,8 @@ def resume_from_checkpoint(accelerator, output_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="Path to YAML config file")
+    parser.add_argument("--resume", default=None,
+                        help="Path to checkpoint directory to resume from (overrides auto-resume)")
     parser.add_argument("--dry_run", action="store_true",
                         help="Run 5 steps then exit (smoke test)")
     args = parser.parse_args()
@@ -112,6 +126,7 @@ def main():
     dcfg  = cfg["data"]
     tcfg  = cfg["training"]
     lcfg  = cfg["logging"]
+    fgcfg = cfg.get("foreground", {})
 
     # ── Accelerator ───────────────────────────────────────────────────────────
     accelerator = Accelerator(
@@ -141,7 +156,10 @@ def main():
         num_heads=mcfg.get("lam_num_heads", 8),
         dropout=mcfg.get("lam_dropout", 0.0),
     )
-    beta = mcfg.get("beta", 1e-6)
+    beta       = mcfg.get("beta", 1e-6)
+    use_fg     = fgcfg.get("use_fg_loss", False)
+    fg_weight  = fgcfg.get("fg_weight", 5.0)
+    accelerator.print(f"Foreground loss: {'ON (weight=%.1f)' % fg_weight if use_fg else 'OFF'}")
     accelerator.print(
         f"Model params: {sum(p.numel() for p in model.parameters()) / 1e6:.1f}M"
     )
@@ -156,6 +174,7 @@ def main():
         split="train",
         val_ratio=dcfg.get("val_ratio", 0.05),
         seed=dcfg.get("seed", 42),
+        use_fg_mask=use_fg,
     )
     val_ds = AgibotVideoDataset(
         data_root=dcfg["data_root"],
@@ -166,8 +185,18 @@ def main():
         split="val",
         val_ratio=dcfg.get("val_ratio", 0.05),
         seed=dcfg.get("seed", 42),
+        use_fg_mask=False,  # val always uses plain loss for fair comparison
     )
     accelerator.print(f"Train pairs: {len(train_ds):,}  Val pairs: {len(val_ds):,}")
+
+    def collate_fn(samples):
+        batch = {}
+        for key in samples[0]:
+            if isinstance(samples[0][key], torch.Tensor):
+                batch[key] = torch.stack([s[key] for s in samples])
+            else:
+                batch[key] = [s[key] for s in samples]  # str fields (task_id, ep_id)
+        return batch
 
     train_loader = DataLoader(
         train_ds,
@@ -177,6 +206,7 @@ def main():
         pin_memory=tcfg.get("pin_memory", True),
         drop_last=True,
         persistent_workers=True,
+        collate_fn=collate_fn,
     )
     val_loader = DataLoader(
         val_ds,
@@ -185,6 +215,7 @@ def main():
         num_workers=4,
         pin_memory=True,
         drop_last=False,
+        collate_fn=collate_fn,
     )
 
     # ── Optimizer & scheduler ─────────────────────────────────────────────────
@@ -210,7 +241,8 @@ def main():
     )
 
     # ── Resume ────────────────────────────────────────────────────────────────
-    global_step = resume_from_checkpoint(accelerator, tcfg["output_dir"])
+    resume_dir = args.resume if args.resume else tcfg["output_dir"]
+    global_step = resume_from_checkpoint(accelerator, resume_dir)
     if global_step > 0:
         # Fast-forward the loader
         skip_batches = global_step % len(train_loader)
@@ -245,7 +277,10 @@ def main():
         with accelerator.accumulate(model):
             outputs = model(batch)
             gt_future = batch["videos"][:, 1:]  # [B, 1, H, W, C]
-            loss, mse, kl = lam_loss(outputs, gt_future, beta)
+            fg_mask = batch.get("fg_mask", None)
+            if fg_mask is not None:
+                fg_mask = fg_mask.to(batch["videos"].device)
+            loss, mse, kl = lam_loss(outputs, gt_future, beta, fg_mask, fg_weight)
             accelerator.backward(loss)
             if accelerator.sync_gradients:
                 accelerator.clip_grad_norm_(model.parameters(), 1.0)

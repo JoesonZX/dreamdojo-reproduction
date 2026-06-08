@@ -1,0 +1,6 @@
+Linear Probe Results — Foreground-LAM (10k fine-tune)
+==================================================
+Task probe  (task_id):   96.8%  [chance: 50.0%,  classes: [np.str_('359'), np.str_('362')]]
+Episode probe (ep_id):   65.9%  [chance: 4.55%,  22 episodes with ≥5 samples]
+
+CONTAMINATED: latent encodes significant scene/appearance info.

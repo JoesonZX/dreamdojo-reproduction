@@ -1,0 +1,6 @@
+Linear Probe Results — Baseline 700M (10k steps)
+==================================================
+Task probe  (task_id):   94.4%  [chance: 50.0%,  classes: [np.str_('359'), np.str_('362')]]
+Episode probe (ep_id):   65.0%  [chance: 4.55%,  22 episodes with ≥5 samples]
+
+CONTAMINATED: latent encodes significant scene/appearance info.

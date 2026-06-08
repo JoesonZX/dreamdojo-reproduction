@@ -1,0 +1,57 @@
+# LAM training config — 700M Foreground-Aware (fine-tune from baseline)
+# Fine-tunes from lam-700m baseline with RAFT-guided foreground loss weighting.
+#
+# Usage (after baseline reaches ~100k steps):
+#   CUDA_VISIBLE_DEVICES=1,2,3 accelerate launch \
+#       --num_processes 3 --mixed_precision bf16 \
+#       /home/xuan/embodied-ai/code/lam/train_lam.py \
+#       --config /home/xuan/embodied-ai/code/lam/config/lam_agibot_700m_fg.yaml
+
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 32
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 1.0e-6
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-700m-fg/log_imgs
+
+data:
+  data_root: /home/xuan/embodied-ai/data/agibotworld/extracted
+  camera: head_color
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2, 3, 4]
+  val_ratio: 0.05
+  seed: 42
+
+foreground:
+  use_fg_loss: true
+  fg_weight: 5.0               # Foreground pixels get 5× reconstruction loss weight
+
+training:
+  per_gpu_batch_size: 16
+  gradient_accumulation_steps: 6
+  num_workers: 8
+  pin_memory: true
+
+  total_steps: 80000           # Fine-tune 80k steps from baseline checkpoint
+  lr: 1.0e-5                   # Lower LR for fine-tuning (40% of baseline LR)
+  weight_decay: 0.01
+  warmup_steps: 500
+  mixed_precision: bf16
+
+  # Resume from 700M baseline checkpoint
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-700m-fg
+  save_every: 5000
+  eval_every: 2000
+  log_every: 100
+  keep_last_n: 3
+
+logging:
+  project: dreamdojo-lam
+  run_name: lam-700m-foreground
+  use_wandb: false

@@ -12,3 +12,5 @@
 [05-31 05:30:37|INFO|cosmos_predict2/inference.py:98:_generate_sample] Saved arguments to /home/xuan/embodied-ai/results/cosmos-rollout/agibot_zero_shot.json
 [05-31 05:30:37|WARNING|cosmos_predict2/inference.py:112:_generate_sample] Guardrail checks on prompt are disabled
 [05-31 05:30:37|INFO|cosmos_predict2/inference.py:132:_generate_sample] Generating video with standard mode...
+[05-31 05:48:46|WARNING|cosmos_predict2/inference.py:167:_generate_sample] Guardrail checks on video are disabled
+[05-31 05:48:49|SUCCESS|cosmos_predict2/inference.py:170:_generate_sample] Saved video to /home/xuan/embodied-ai/results/cosmos-rollout/agibot_zero_shot.mp4

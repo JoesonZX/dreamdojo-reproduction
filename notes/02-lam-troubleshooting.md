@@ -389,7 +389,18 @@ hf download --type model \
 
 预下载后文件缓存在 `~/.cache/huggingface/`，再次运行时 `uvx hf download` 检测到缓存直接返回路径，不需要重新下载和认证。
 
-### 额外问题：Cosmos-Guardrail1 同样是 gated model
+### 额外问题1：`--model=2B` 参数无效
+
+```
+Argument --model: invalid choice: '2B'
+(choose from '2B/pre-trained', '2B/post-trained', '2B/distilled', '14B/pre-trained', '14B/post-trained')
+```
+
+必须指定完整的变体名：`--model=2B/pre-trained`（zero-shot baseline 用 pre-trained）。
+
+---
+
+### 额外问题2：Cosmos-Guardrail1 同样是 gated model
 
 推理流程还会尝试下载 `Cosmos-Guardrail1`（内容安全审核模型），该模型同样是 gated，且对研究用途不必要。
 
@@ -416,5 +427,7 @@ CUDA_VISIBLE_DEVICES=1 .venv/bin/python examples/inference.py \
 - [x] 结果整理到 `results/` 目录
 - [x] Cosmos-Predict2.5 环境配置完成（PyTorch 2.7+cu128）
 - [x] Cosmos 推理问题排查完成
-- [ ] Cosmos Zero-Shot Rollout 完成（推理中）
+- [x] Cosmos Zero-Shot Rollout 完成（结果见 results/cosmos-rollout/）
+- [x] Post-Training 数据格式调研完成（见 08-post-training.md）
+- [ ] AgiBot HDF5 → 训练格式转换脚本
 - [ ] Post-Training
