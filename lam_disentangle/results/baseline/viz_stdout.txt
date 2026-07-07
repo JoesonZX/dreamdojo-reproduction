@@ -1,0 +1,5 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/baseline/step_0010000 | latent_dim=32 action_part=32
+Val size: 80,509
+/home/xuan/embodied-ai/code/lam_disentangle/code/eval.py:226: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cmap = cm.get_cmap("tab20" if n_colors <= 20 else "hsv", n_colors)
+Saved t-SNE -> /home/xuan/embodied-ai/code/lam_disentangle/results/baseline/tsne.png

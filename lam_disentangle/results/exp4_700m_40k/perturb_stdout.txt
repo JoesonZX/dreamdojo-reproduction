@@ -1,0 +1,3 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/exp4_700m_40k/step_0040000 | latent_dim=40 action_part=32
+Val size: 80,509
+Saved perturbation grid -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp4_700m_40k/perturb.png

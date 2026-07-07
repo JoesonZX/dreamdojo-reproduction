@@ -1,0 +1,67 @@
+# LAM fine-tune config: EgoDex + SAM3 foreground masks + SigLIP contrastive loss
+# Resume from: checkpoints/lam-egodex-baseline/step_0010000
+
+# ── Model ─────────────────────────────────────────────────────────────────────
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 32
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 1.0e-6
+  log_interval: 500
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-egodex-sam3-siglip/log_imgs
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+data:
+  dataset_type: egodex
+  data_root: /home/xuan/embodied-ai/data/egodex/test
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+
+# ── Foreground loss (SAM3 masks) ──────────────────────────────────────────────
+foreground:
+  use_fg_loss: true
+  fg_weight: 10.0
+  fg_mask_type: sam3
+
+# ── SigLIP contrastive loss ───────────────────────────────────────────────────
+siglip:
+  use_siglip_loss: true
+  lambda_siglip: 0.1
+  text_dim: 768
+  proj_hidden_dim: 256
+
+# ── Training ──────────────────────────────────────────────────────────────────
+training:
+  per_gpu_batch_size: 16
+  gradient_accumulation_steps: 6
+  num_workers: 8
+  pin_memory: true
+
+  total_steps: 10000
+  lr: 1.0e-5
+  weight_decay: 0.01
+  optimizer: adamw
+  lr_scheduler: cosine
+  warmup_steps: 200
+
+  mixed_precision: bf16
+
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-egodex-sam3-siglip
+  save_every: 2000
+  eval_every: 1000
+  log_every: 100
+  keep_last_n: 3
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  project: dreamdojo-lam
+  run_name: lam-egodex-sam3-siglip-10k
+  use_wandb: false

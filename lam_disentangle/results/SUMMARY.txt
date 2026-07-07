@@ -1,0 +1,56 @@
+==== LAM disentanglement — evaluation summary ====
+generated: Wed Jun 17 05:42:19 AM EDT 2026
+
+### baseline
+-- real-action regression R^2 (action-sub should be >> env-sub) --
+  full z_mu        : R2= 0.003  MSE=0.3749
+  action-sub [:32] : R2= 0.003  MSE=0.3749
+  env-sub    [32:] : (no dims)
+  action-sub: task   9.0% (chance 0.9%)  |  ep   7.8% (chance 0.34%)
+  env-sub: (no dims)
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+-- classification (action-sub vs env-sub) --
+  action-sub: task   9.0% (chance 0.9%)  |  ep   7.8% (chance 0.34%)
+-- reconstruction (world-model-quality proxy) --
+Eval on 1024 samples:  MSE=0.000838  PSNR=30.77 dB
+
+### exp1_action
+-- real-action regression R^2 (action-sub should be >> env-sub) --
+  full z_mu        : R2= 0.126  MSE=0.3323
+  action-sub [:32] : R2= 0.126  MSE=0.3323
+  env-sub    [32:] : (no dims)
+  action-sub: task  48.8% (chance 0.9%)  |  ep  44.9% (chance 0.34%)
+  env-sub: (no dims)
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+-- classification (action-sub vs env-sub) --
+  action-sub: task  48.8% (chance 0.9%)  |  ep  44.9% (chance 0.34%)
+-- reconstruction (world-model-quality proxy) --
+Eval on 1024 samples:  MSE=0.001097  PSNR=29.60 dB
+
+### exp2_split
+-- real-action regression R^2 (action-sub should be >> env-sub) --
+  full z_mu        : R2= 0.129  MSE=0.3305
+  action-sub [:32] : R2= 0.133  MSE=0.3289
+  env-sub    [32:] : R2= 0.088  MSE=0.3436
+  action-sub: task  51.1% (chance 0.9%)  |  ep  47.6% (chance 0.34%)
+  env-sub   : task  19.0% (chance 0.9%)  |  ep  18.4% (chance 0.34%)
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+-- classification (action-sub vs env-sub) --
+  action-sub: task  51.1% (chance 0.9%)  |  ep  47.6% (chance 0.34%)
+  env-sub   : task  19.0% (chance 0.9%)  |  ep  18.4% (chance 0.34%)
+-- reconstruction (world-model-quality proxy) --
+Eval on 1024 samples:  MSE=0.001095  PSNR=29.61 dB
+
+### exp3_indep
+-- real-action regression R^2 (action-sub should be >> env-sub) --
+  full z_mu        : R2=-0.001  MSE=0.3732
+  action-sub [:32] : R2=-0.002  MSE=0.3734
+  env-sub    [32:] : R2=-0.000  MSE=0.3726
+  action-sub: task  10.8% (chance 0.9%)  |  ep  13.2% (chance 0.34%)
+  env-sub   : task   5.9% (chance 0.9%)  |  ep  10.7% (chance 0.34%)
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+-- classification (action-sub vs env-sub) --
+  action-sub: task  10.8% (chance 0.9%)  |  ep  13.2% (chance 0.34%)
+  env-sub   : task   5.9% (chance 0.9%)  |  ep  10.7% (chance 0.34%)
+-- reconstruction (world-model-quality proxy) --
+Eval on 1024 samples:  MSE=0.000978  PSNR=30.09 dB

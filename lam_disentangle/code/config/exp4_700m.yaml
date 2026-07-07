@@ -1,0 +1,49 @@
+# Exp4-700M — action-subspace KL bottleneck (beta_a=3e-3) — best small-scale config.
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 40
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 3.0e-3        # beta_action: KL bottleneck on z_a[:32]
+  beta_env: 1.0e-6     # weak KL on z_e[32:]
+  env_dim: 8
+  action_dim: 18
+  action_head: true
+  lambda_action: 1.0
+  lambda_indep: 0.0
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-dis/exp4_700m/log_imgs
+
+data:
+  dataset_type: egodex
+  data_root: /home/xuan/embodied-ai/data/egodex/test_240p
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+  load_actions: false
+
+training:
+  per_gpu_batch_size: 16        # 700M max that fits in 49GB (39GB peak); accum=1
+  gradient_accumulation_steps: 1
+  num_workers: 8
+  pin_memory: true
+  total_steps: 10000
+  lr: 2.5e-5
+  weight_decay: 0.01
+  warmup_steps: 1000
+  mixed_precision: bf16
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-dis/exp4_700m
+  save_every: 2000
+  eval_every: 1000
+  log_every: 100
+  keep_last_n: 2
+
+logging:
+  project: dreamdojo-lam-disentangle
+  run_name: dis-exp4-700m-ba3e3
+  use_wandb: false

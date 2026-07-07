@@ -1,0 +1,4 @@
+notes/*.pdf
+code/__pycache__/
+**/__pycache__/
+*.pyc

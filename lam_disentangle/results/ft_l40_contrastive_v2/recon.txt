@@ -1,0 +1,3 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive_v2/step_0001000 | latent_dim=40 action_part=32
+Val size: 80,509
+Eval on 1024 samples:  MSE=0.000591  PSNR=32.28 dB

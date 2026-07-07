@@ -1,0 +1,29 @@
+Action Probe — ft_l40_contrastive_v2
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.147
+  Lhand Δpos  : R2(mean)= 0.133  MSE(mean)=0.4537  per-dim R2=[0.160, 0.159, 0.082]
+  Lhand 6Drot : R2(mean)= 0.087  MSE(mean)=0.3494  per-dim R2=[0.169, 0.037, 0.059, 0.035, 0.160, 0.060]
+  Rhand Δpos  : R2(mean)= 0.265  MSE(mean)=0.2366  per-dim R2=[0.351, 0.368, 0.076]
+  Rhand 6Drot : R2(mean)= 0.156  MSE(mean)=0.2706  per-dim R2=[0.251, 0.188, 0.078, 0.191, 0.185, 0.041]
+
+[action-sub]  overall(uniform) R2= 0.148
+  Lhand Δpos  : R2(mean)= 0.132  MSE(mean)=0.4547  per-dim R2=[0.173, 0.145, 0.078]
+  Lhand 6Drot : R2(mean)= 0.089  MSE(mean)=0.3489  per-dim R2=[0.178, 0.038, 0.061, 0.036, 0.163, 0.059]
+  Rhand Δpos  : R2(mean)= 0.268  MSE(mean)=0.2360  per-dim R2=[0.346, 0.365, 0.093]
+  Rhand 6Drot : R2(mean)= 0.155  MSE(mean)=0.2707  per-dim R2=[0.241, 0.189, 0.080, 0.191, 0.183, 0.044]
+
+[env-sub]  overall(uniform) R2= 0.027
+  Lhand Δpos  : R2(mean)= 0.006  MSE(mean)=0.5229  per-dim R2=[-0.003, 0.017, 0.004]
+  Lhand 6Drot : R2(mean)= 0.029  MSE(mean)=0.3690  per-dim R2=[0.099, 0.004, -0.007, 0.004, 0.072, 0.001]
+  Rhand Δpos  : R2(mean)= 0.010  MSE(mean)=0.3255  per-dim R2=[0.020, 0.008, 0.001]
+  Rhand 6Drot : R2(mean)= 0.044  MSE(mean)=0.3098  per-dim R2=[0.170, 0.005, -0.011, 0.005, 0.100, -0.004]
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  50.9% (chance 0.9%)  |  ep  46.2% (chance 0.34%)
+  env-sub   : task  19.0% (chance 0.9%)  |  ep  18.6% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.

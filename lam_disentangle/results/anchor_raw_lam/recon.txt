@@ -1,0 +1,5 @@
+[init_from] LAM_400k.ckpt: loaded 839/843 tensors
+[init_from] left random-init (4): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight
+Loaded /home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt | latent_dim=32 action_part=32
+Val size: 80,509
+Eval on 1024 samples:  MSE=0.000148  PSNR=38.29 dB

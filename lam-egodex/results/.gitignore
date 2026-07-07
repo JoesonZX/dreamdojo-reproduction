@@ -1,0 +1,7 @@
+# Keep directory structure but ignore large binary files
+*.mp4
+*.avi
+*.pkl
+
+# Keep PNG result images (they should be pushed to GitHub)
+!*.png

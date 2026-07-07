@@ -1,0 +1,32 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k/step_0005000 | latent_dim=40 action_part=32
+Val size: 80,509
+Action Probe — 
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.344
+  Lhand Δpos  : R2(mean)= 0.454  MSE(mean)=0.2856  per-dim R2=[0.591, 0.411, 0.360]
+  Lhand 6Drot : R2(mean)= 0.203  MSE(mean)=0.2969  per-dim R2=[0.227, 0.212, 0.175, 0.216, 0.173, 0.217]
+  Rhand Δpos  : R2(mean)= 0.539  MSE(mean)=0.1450  per-dim R2=[0.680, 0.597, 0.340]
+  Rhand 6Drot : R2(mean)= 0.333  MSE(mean)=0.2107  per-dim R2=[0.374, 0.410, 0.275, 0.409, 0.332, 0.196]
+
+[action-sub]  overall(uniform) R2= 0.346
+  Lhand Δpos  : R2(mean)= 0.463  MSE(mean)=0.2800  per-dim R2=[0.605, 0.430, 0.354]
+  Lhand 6Drot : R2(mean)= 0.203  MSE(mean)=0.2960  per-dim R2=[0.215, 0.211, 0.173, 0.211, 0.170, 0.239]
+  Rhand Δpos  : R2(mean)= 0.539  MSE(mean)=0.1450  per-dim R2=[0.681, 0.599, 0.337]
+  Rhand 6Drot : R2(mean)= 0.335  MSE(mean)=0.2095  per-dim R2=[0.378, 0.414, 0.275, 0.413, 0.326, 0.205]
+
+[env-sub]  overall(uniform) R2= 0.145
+  Lhand Δpos  : R2(mean)= 0.114  MSE(mean)=0.4616  per-dim R2=[0.182, 0.146, 0.015]
+  Lhand 6Drot : R2(mean)= 0.054  MSE(mean)=0.3506  per-dim R2=[-0.024, 0.081, 0.072, 0.084, 0.082, 0.031]
+  Rhand Δpos  : R2(mean)= 0.334  MSE(mean)=0.2137  per-dim R2=[0.451, 0.382, 0.168]
+  Rhand 6Drot : R2(mean)= 0.157  MSE(mean)=0.2623  per-dim R2=[0.121, 0.256, 0.115, 0.256, 0.131, 0.063]
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  21.1% (chance 0.9%)  |  ep  18.3% (chance 0.34%)
+  env-sub   : task   6.8% (chance 0.9%)  |  ep   6.6% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/lam_disentangle/results/ft_l40_full_5k/probe.txt

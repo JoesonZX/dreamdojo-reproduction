@@ -1,0 +1,11 @@
+[04:27:43] waiting for 4 trainings to complete...
+[05:37:46] all 4 trainings complete
+[05:37:46] [baseline] evaluating /home/xuan/embodied-ai/checkpoints/lam-dis/baseline/step_0010000
+[05:38:46] [baseline] done -> /home/xuan/embodied-ai/code/lam_disentangle/results/baseline
+[05:38:46] [exp1_action] evaluating /home/xuan/embodied-ai/checkpoints/lam-dis/exp1_action/step_0010000
+[05:39:54] [exp1_action] done -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp1_action
+[05:39:54] [exp2_split] evaluating /home/xuan/embodied-ai/checkpoints/lam-dis/exp2_split/step_0010000
+[05:41:02] [exp2_split] done -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp2_split
+[05:41:02] [exp3_indep] evaluating /home/xuan/embodied-ai/checkpoints/lam-dis/exp3_indep/step_0010000
+[05:42:19] [exp3_indep] done -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp3_indep
+[05:42:19] ALL EVALS COMPLETE -> /home/xuan/embodied-ai/code/lam_disentangle/results/SUMMARY.txt

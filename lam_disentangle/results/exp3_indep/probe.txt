@@ -1,0 +1,14 @@
+Action Probe — 
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+-- Real-action regression (Ridge), R^2 (higher=more action info) --
+  full z_mu        : R2=-0.001  MSE=0.3732
+  action-sub [:32] : R2=-0.002  MSE=0.3734
+  env-sub    [32:] : R2=-0.000  MSE=0.3726
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  10.8% (chance 0.9%)  |  ep  13.2% (chance 0.34%)
+  env-sub   : task   5.9% (chance 0.9%)  |  ep  10.7% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.

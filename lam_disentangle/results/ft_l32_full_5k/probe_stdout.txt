@@ -1,0 +1,46 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l32_full_5k/step_0005000 | latent_dim=32 action_part=32
+Val size: 80,509
+/home/xuan/.venv/lib/python3.10/site-packages/sklearn/linear_model/_logistic.py:473: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+/home/xuan/.venv/lib/python3.10/site-packages/sklearn/linear_model/_logistic.py:473: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+Action Probe — 
+========================================================
+n=4000  latent_dim=32  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.332
+  Lhand Δpos  : R2(mean)= 0.430  MSE(mean)=0.3001  per-dim R2=[0.617, 0.340, 0.331]
+  Lhand 6Drot : R2(mean)= 0.185  MSE(mean)=0.3027  per-dim R2=[0.170, 0.210, 0.182, 0.214, 0.171, 0.165]
+  Rhand Δpos  : R2(mean)= 0.515  MSE(mean)=0.1528  per-dim R2=[0.650, 0.602, 0.292]
+  Rhand 6Drot : R2(mean)= 0.339  MSE(mean)=0.2093  per-dim R2=[0.420, 0.417, 0.296, 0.417, 0.327, 0.160]
+
+[action-sub]  overall(uniform) R2= 0.332
+  Lhand Δpos  : R2(mean)= 0.430  MSE(mean)=0.3001  per-dim R2=[0.617, 0.340, 0.331]
+  Lhand 6Drot : R2(mean)= 0.185  MSE(mean)=0.3027  per-dim R2=[0.170, 0.210, 0.182, 0.214, 0.171, 0.165]
+  Rhand Δpos  : R2(mean)= 0.515  MSE(mean)=0.1528  per-dim R2=[0.650, 0.602, 0.292]
+  Rhand 6Drot : R2(mean)= 0.339  MSE(mean)=0.2093  per-dim R2=[0.420, 0.417, 0.296, 0.417, 0.327, 0.160]
+
+[env-sub]: (no dims)
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  22.9% (chance 0.9%)  |  ep  20.4% (chance 0.34%)
+  env-sub: (no dims)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/lam_disentangle/results/ft_l32_full_5k/probe.txt

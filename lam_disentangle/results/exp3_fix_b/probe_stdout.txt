@@ -1,0 +1,17 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/exp3_fix_b/step_0010000 | latent_dim=40 action_part=32
+Val size: 80,509
+Action Probe — 
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+-- Real-action regression (Ridge), R^2 (higher=more action info) --
+  full z_mu        : R2= 0.024  MSE=0.3682
+  action-sub [:32] : R2= 0.026  MSE=0.3672
+  env-sub    [32:] : R2=-0.003  MSE=0.3740
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  29.5% (chance 0.9%)  |  ep  28.3% (chance 0.34%)
+  env-sub   : task   7.5% (chance 0.9%)  |  ep  15.4% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp3_fix_b/probe.txt

@@ -1,0 +1,11 @@
+Action-subspace clustering — ft_l40_contrastive_v2
+========================================================
+n=4000  action_part=32  (cosine distance on z_a, unit-normed)
+
+  d[same-action same-episode  ] = 0.4305   (pairs=121,530)
+  d[same-action diff-episode  ] = 0.4951   (pairs=109,716)
+  d[diff-action               ] = 0.6125   (pairs=15,764,754)
+
+  scene-invariance gap (d_sd - d_ss) = +0.0646   (→0 = z_a ignores scene; <0 = cross-ep even tighter)
+  separation ratio     (d_dd / d_sd) = 1.237    (↑ = actions better separated)
+  silhouette (task labels on z_a)    = -0.1298   (↑ = tighter action clusters)

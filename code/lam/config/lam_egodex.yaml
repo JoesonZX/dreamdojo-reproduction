@@ -1,0 +1,55 @@
+# LAM training config for EgoDex test split
+# 111 action categories, 3243 episodes, ~7 hours video
+# First-person hand manipulation (Apple Vision Pro)
+
+# ── Model ─────────────────────────────────────────────────────────────────────
+model:
+  image_channels: 3
+  lam_model_dim: 1024          # DreamDojo 700M scale
+  lam_latent_dim: 32
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 1.0e-6
+  log_interval: 500
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-egodex-baseline/log_imgs
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+data:
+  dataset_type: egodex          # tells train_lam.py to use EgoDexDataset
+  data_root: /home/xuan/embodied-ai/data/egodex/test
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]    # EgoDex videos are short (~5s), keep small
+  val_ratio: 0.1
+  seed: 42
+
+# ── Training ──────────────────────────────────────────────────────────────────
+training:
+  per_gpu_batch_size: 16
+  gradient_accumulation_steps: 6   # effective batch = 16 * 3 * 6 = 288
+  num_workers: 8
+  pin_memory: true
+
+  total_steps: 10000
+  lr: 2.5e-5
+  weight_decay: 0.01
+  optimizer: adamw
+  lr_scheduler: cosine
+  warmup_steps: 1000
+
+  mixed_precision: bf16
+
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-egodex-baseline
+  save_every: 2000
+  eval_every: 1000
+  log_every: 100
+  keep_last_n: 3
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  project: dreamdojo-lam
+  run_name: lam-egodex-baseline-10k
+  use_wandb: false

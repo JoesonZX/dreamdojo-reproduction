@@ -1,0 +1,19 @@
+Action-subspace clustering — raw_LAM_400k
+========================================================
+n=4000  action_part=32  (cosine distance on z_a, unit-normed)
+
+[action label = task]  (n=4000)
+  d[same-action same-episode  ] = 0.7022
+  d[same-action diff-episode  ] = 0.7514
+  d[diff-action               ] = 0.7837
+  scene-invariance gap (d_sd - d_ss) = +0.0491   (→0 = z_a ignores scene within an action)
+  separation ratio     (d_dd / d_sd) = 1.043    (↑ = actions better separated)
+  silhouette                          = -0.2565   (↑ = tighter action clusters)
+
+[action label = verb]  (n=3691)
+  d[same-action same-episode  ] = 0.7055
+  d[same-action diff-episode  ] = 0.7504
+  d[diff-action               ] = 0.7904
+  scene-invariance gap (d_sd - d_ss) = +0.0449   (→0 = z_a ignores scene within an action)
+  separation ratio     (d_dd / d_sd) = 1.053    (↑ = actions better separated)
+  silhouette                          = -0.2441   (↑ = tighter action clusters)

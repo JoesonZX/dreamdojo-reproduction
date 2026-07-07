@@ -28,6 +28,7 @@ sys.path.insert(0, str(LAM_DATA_PATH))
 
 from lam.modules import LatentActionModel
 from data.agibot_dataset import AgibotVideoDataset
+from data.egodex_dataset import EgoDexDataset
 
 
 def load_model(checkpoint_dir: str, cfg: dict, device: torch.device) -> LatentActionModel:
@@ -109,21 +110,24 @@ def eval_visualize_latents(model, val_loader, device, n_samples=2000, out_path="
     all_mu      = []
     all_task_id = []
     all_ep_id   = []
+    all_verb_id = []
 
     with torch.no_grad():
         for batch in val_loader:
             videos = batch["videos"].to(device)
             outputs = model({"videos": videos})
             all_mu.extend(outputs["z_mu"].cpu().numpy())
-            # task_id / ep_id are lists of strings from the dataset
             all_task_id.extend(batch.get("task_id", ["unknown"] * videos.shape[0]))
             all_ep_id.extend(batch.get("ep_id",   ["unknown"] * videos.shape[0]))
+            all_verb_id.extend(batch.get("verb_id", ["unknown"] * videos.shape[0]))
             if len(all_mu) >= n_samples:
                 break
 
     mu_arr      = np.array(all_mu[:n_samples])
     task_labels = all_task_id[:n_samples]
     ep_labels   = all_ep_id[:n_samples]
+    verb_labels = all_verb_id[:n_samples]
+    has_verbs   = verb_labels[0] != "unknown"
 
     print(f"Running t-SNE on {mu_arr.shape[0]} latent vectors…")
     emb = TSNE(n_components=2, random_state=42, perplexity=40).fit_transform(mu_arr)
@@ -135,26 +139,34 @@ def eval_visualize_latents(model, val_loader, device, n_samples=2000, out_path="
 
     task_int, task_uniq = _label_to_int(task_labels)
     ep_int,   ep_uniq   = _label_to_int(ep_labels)
+    verb_int, verb_uniq = _label_to_int(verb_labels)
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 7))
+    # 3 panels if verbs available, 2 otherwise
+    n_panels = 3 if has_verbs else 2
+    fig, axes = plt.subplots(1, n_panels, figsize=(8 * n_panels, 7))
+    if n_panels == 2:
+        axes = list(axes)
 
-    for ax, color_int, uniq, title in [
-        (axes[0], task_int, task_uniq, "Colored by task_id (action label)"),
-        (axes[1], ep_int,   ep_uniq,   "Colored by ep_id (scene/appearance)"),
-    ]:
+    panels = [
+        (axes[0], task_int, task_uniq, "By task_id (111 action tasks)"),
+        (axes[1], ep_int,   ep_uniq,   "By ep_id (scene/appearance)"),
+    ]
+    if has_verbs:
+        panels.append((axes[2], verb_int, verb_uniq, "By primary verb (llm_verbs)"))
+
+    for ax, color_int, uniq, title in panels:
         n_colors = len(uniq)
         cmap = cm.get_cmap("tab20" if n_colors <= 20 else "hsv", n_colors)
-        sc = ax.scatter(emb[:, 0], emb[:, 1], c=color_int, cmap=cmap,
-                        s=3, alpha=0.6, vmin=0, vmax=n_colors - 1)
+        ax.scatter(emb[:, 0], emb[:, 1], c=color_int, cmap=cmap,
+                   s=3, alpha=0.6, vmin=0, vmax=n_colors - 1)
         ax.set_title(title, fontsize=11)
         ax.axis("off")
-        # Legend (cap at 20 entries to keep it readable)
         handles = [
             plt.Line2D([0], [0], marker="o", color="w",
                        markerfacecolor=cmap(i / max(n_colors - 1, 1)), markersize=6)
-            for i in range(min(n_colors, 20))
+            for i in range(min(n_colors, 30))
         ]
-        ax.legend(handles, uniq[:20], loc="best", fontsize=6,
+        ax.legend(handles, uniq[:30], loc="best", fontsize=6,
                   markerscale=1.5, framealpha=0.6)
 
     title = f"t-SNE of LAM latent actions (z_mu){' — ' + label if label else ''}"
@@ -191,6 +203,7 @@ def eval_linear_probe(model, val_loader, device, n_samples=5000, out_path="probe
     all_mu      = []
     all_task_id = []
     all_ep_id   = []
+    all_verb_id = []
 
     print(f"Extracting {n_samples} latent vectors…")
     with torch.no_grad():
@@ -200,32 +213,52 @@ def eval_linear_probe(model, val_loader, device, n_samples=5000, out_path="probe
             all_mu.extend(outputs["z_mu"].cpu().numpy())
             all_task_id.extend(batch.get("task_id", ["unknown"] * videos.shape[0]))
             all_ep_id.extend(batch.get("ep_id",   ["unknown"] * videos.shape[0]))
+            all_verb_id.extend(batch.get("verb_id", ["unknown"] * videos.shape[0]))
             if len(all_mu) >= n_samples:
                 break
 
     mu_arr      = np.array(all_mu[:n_samples])
     task_labels = all_task_id[:n_samples]
     ep_labels   = all_ep_id[:n_samples]
+    verb_labels = all_verb_id[:n_samples]
 
     lines = [f"Linear Probe Results — {label}", "=" * 50]
 
-    # ── Task probe ────────────────────────────────────────────────────────────
-    le_task  = LabelEncoder()
-    task_int = le_task.fit_transform(task_labels)
-    X_tr, X_te, y_tr, y_te = train_test_split(
-        mu_arr, task_int, test_size=0.2, random_state=42, stratify=task_int
-    )
-    clf_task = LogisticRegression(max_iter=1000, C=1.0, n_jobs=-1)
-    clf_task.fit(X_tr, y_tr)
-    task_acc   = accuracy_score(y_te, clf_task.predict(X_te))
-    task_chance = 1.0 / len(le_task.classes_)
+    def run_probe(mu, labels, name):
+        le = LabelEncoder()
+        y  = le.fit_transform(labels)
+        counts = np.bincount(y)
+        stratify = y if counts.min() >= 2 else None
+        X_tr, X_te, y_tr, y_te = train_test_split(
+            mu, y, test_size=0.2, random_state=42, stratify=stratify
+        )
+        clf = LogisticRegression(max_iter=1000, C=1.0, n_jobs=-1)
+        clf.fit(X_tr, y_tr)
+        acc    = accuracy_score(y_te, clf.predict(X_te))
+        chance = 1.0 / len(le.classes_)
+        msg = (f"{name}: {acc*100:5.1f}%  "
+               f"[chance: {chance*100:.1f}%,  {len(le.classes_)} classes]")
+        print(msg); lines.append(msg)
+        return acc, chance, le.classes_
 
-    msg = (f"Task probe  (task_id):  {task_acc*100:5.1f}%  "
-           f"[chance: {task_chance*100:.1f}%,  classes: {list(le_task.classes_)}]")
-    print(msg); lines.append(msg)
+    # ── Verb probe (primary llm_verb — best action label) ─────────────────────
+    # Filter out samples where HDF5 had no llm_verbs (returned as "unknown")
+    verb_keep = [i for i, v in enumerate(verb_labels) if v != "unknown"]
+    has_verbs = len(verb_keep) > 0
+    verb_acc = verb_chance = None
+    if has_verbs:
+        mu_verb  = mu_arr[[i for i in verb_keep]]
+        vl_filt  = [verb_labels[i] for i in verb_keep]
+        verb_acc, verb_chance, verb_classes = run_probe(
+            mu_verb, vl_filt,
+            f"Verb  probe (llm_verbs, n={len(verb_keep)})"
+        )
+        lines.append(f"  verb classes: {list(verb_classes)}")
 
-    # ── Episode probe ─────────────────────────────────────────────────────────
-    # Keep only episodes with ≥5 samples so the classifier has something to learn
+    # ── Task probe (task folder name — coarser label) ─────────────────────────
+    task_acc, task_chance, _ = run_probe(mu_arr, task_labels, "Task  probe (task_id) ")
+
+    # ── Episode probe (appearance contamination check) ────────────────────────
     ep_counts = Counter(ep_labels)
     valid_eps = {ep for ep, cnt in ep_counts.items() if cnt >= 5}
     keep      = [i for i, ep in enumerate(ep_labels) if ep in valid_eps]
@@ -234,26 +267,43 @@ def eval_linear_probe(model, val_loader, device, n_samples=5000, out_path="probe
 
     le_ep  = LabelEncoder()
     ep_int = le_ep.fit_transform(ep_filt)
+    ep_counts_arr = np.bincount(ep_int)
+    stratify_ep = ep_int if ep_counts_arr.min() >= 2 else None
     X_tr, X_te, y_tr, y_te = train_test_split(
-        mu_ep, ep_int, test_size=0.2, random_state=42, stratify=ep_int
+        mu_ep, ep_int, test_size=0.2, random_state=42, stratify=stratify_ep
     )
-    clf_ep  = LogisticRegression(max_iter=1000, C=1.0, n_jobs=-1)
+    clf_ep = LogisticRegression(max_iter=1000, C=1.0, n_jobs=-1)
     clf_ep.fit(X_tr, y_tr)
-    ep_acc   = accuracy_score(y_te, clf_ep.predict(X_te))
+    ep_acc    = accuracy_score(y_te, clf_ep.predict(X_te))
     ep_chance = 1.0 / len(valid_eps)
-
-    msg = (f"Episode probe (ep_id):  {ep_acc*100:5.1f}%  "
+    msg = (f"Ep    probe (ep_id)  :  {ep_acc*100:5.1f}%  "
            f"[chance: {ep_chance*100:.2f}%,  {len(valid_eps)} episodes with ≥5 samples]")
     print(msg); lines.append(msg)
 
     # ── Interpretation ────────────────────────────────────────────────────────
     lines.append("")
-    if ep_acc < 0.25:
+    action_acc = verb_acc if has_verbs else task_acc
+    action_chance = verb_chance if has_verbs else task_chance
+
+    # Use chance-relative lift to avoid false CLEAN on hard many-class problems.
+    # A 11% ep_acc with 1.4% chance = 8x lift — clearly contaminated.
+    ep_lift = ep_acc / max(ep_chance, 1e-6)
+    if ep_lift < 3.0:
         verdict = "CLEAN: latent is not contaminated by scene appearance."
-    elif ep_acc < 0.5:
+    elif ep_lift < 6.0:
         verdict = "MILD contamination: some scene info encoded."
     else:
         verdict = "CONTAMINATED: latent encodes significant scene/appearance info."
+
+    if action_acc is not None and action_chance is not None:
+        action_lift = action_acc / max(action_chance, 1e-6)
+        ratio = action_lift / max(ep_lift, 1e-6)
+        action_verdict = (
+            f"Action/Appearance ratio (chance-normalized): {ratio:.2f}x  "
+            f"({'action-dominant' if ratio > 1.5 else 'appearance-dominant' if ratio < 0.7 else 'mixed'})"
+        )
+        print(action_verdict); lines.append(action_verdict)
+
     print(verdict); lines.append(verdict)
 
     if out_path:
@@ -261,8 +311,8 @@ def eval_linear_probe(model, val_loader, device, n_samples=5000, out_path="probe
         Path(out_path).write_text("\n".join(lines))
         print(f"Saved → {out_path}")
 
-    return {"task_acc": task_acc, "ep_acc": ep_acc,
-            "task_chance": task_chance, "ep_chance": ep_chance}
+    return {"task_acc": task_acc, "ep_acc": ep_acc, "verb_acc": verb_acc,
+            "task_chance": task_chance, "ep_chance": ep_chance, "verb_chance": verb_chance}
 
 
 def eval_motion_cluster(model, cfg, device, n_samples=2000, out_path="motion_tsne.png", label=""):
@@ -421,16 +471,29 @@ def main():
     model = load_model(args.checkpoint, cfg, device)
     print(f"Model loaded from {args.checkpoint}")
 
-    val_ds = AgibotVideoDataset(
-        data_root=dcfg["data_root"],
-        camera=dcfg.get("camera", "top"),
-        img_h=dcfg.get("img_h", 240),
-        img_w=dcfg.get("img_w", 320),
-        downsample_factors=(1,),
-        split="val",
-        val_ratio=dcfg.get("val_ratio", 0.05),
-        seed=dcfg.get("seed", 42),
-    )
+    dataset_type = dcfg.get("dataset_type", "agibot")
+    if dataset_type == "egodex":
+        val_ds = EgoDexDataset(
+            data_root=dcfg["data_root"],
+            img_h=dcfg.get("img_h", 240),
+            img_w=dcfg.get("img_w", 320),
+            downsample_factors=(1,),
+            split="val",
+            val_ratio=dcfg.get("val_ratio", 0.1),
+            seed=dcfg.get("seed", 42),
+            load_verbs=True,
+        )
+    else:
+        val_ds = AgibotVideoDataset(
+            data_root=dcfg["data_root"],
+            camera=dcfg.get("camera", "head_color"),
+            img_h=dcfg.get("img_h", 240),
+            img_w=dcfg.get("img_w", 320),
+            downsample_factors=(1,),
+            split="val",
+            val_ratio=dcfg.get("val_ratio", 0.05),
+            seed=dcfg.get("seed", 42),
+        )
     def collate_fn(samples):
         batch = {}
         for key in samples[0]:
@@ -440,8 +503,10 @@ def main():
                 batch[key] = [s[key] for s in samples]
         return batch
 
+    g = torch.Generator()
+    g.manual_seed(42)
     val_loader = DataLoader(val_ds, batch_size=32, shuffle=True, num_workers=4,
-                            collate_fn=collate_fn)
+                            collate_fn=collate_fn, generator=g)
     print(f"Val dataset size: {len(val_ds):,}")
 
     if args.mode == "reconstruction":

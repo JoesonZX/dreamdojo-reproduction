@@ -35,12 +35,16 @@ except ImportError:
     import cv2
 
 
-def load_frames_as_tensor(video_path: Path, device: torch.device) -> torch.Tensor:
-    """Load all frames as float32 [N, 3, H, W] tensor in [0, 1]."""
+def load_frames_cpu(video_path: Path, raft_h: int, raft_w: int):
+    """Load all frames as float32 [N, 3, H, W] on CPU, resized for RAFT.
+
+    Keeps frames on CPU to avoid OOM on long 1080p videos.
+    Only 2 frames are moved to GPU at inference time.
+    """
     if _HAVE_DECORD:
         vr = decord.VideoReader(str(video_path), ctx=decord.cpu(0))
         frames = vr.get_batch(list(range(len(vr))))  # [N, H, W, 3] uint8
-        frames = frames.float() / 255.0              # [N, H, W, 3]
+        frames = frames.float() / 255.0
         frames = frames.permute(0, 3, 1, 2)          # [N, 3, H, W]
     else:
         cap = cv2.VideoCapture(str(video_path))
@@ -55,7 +59,13 @@ def load_frames_as_tensor(video_path: Path, device: torch.device) -> torch.Tenso
         if not frames_list:
             return torch.zeros(0, 3, 1, 1)
         frames = torch.stack(frames_list).permute(0, 3, 1, 2)  # [N, 3, H, W]
-    return frames.to(device)
+
+    # Resize on CPU (avoid allocating large GPU tensor for whole video)
+    h, w = frames.shape[2], frames.shape[3]
+    if h != raft_h or w != raft_w:
+        frames = F.interpolate(frames, size=(raft_h, raft_w),
+                               mode="bilinear", align_corners=False)
+    return frames  # stays on CPU
 
 
 def compute_masks_for_episode(
@@ -66,14 +76,42 @@ def compute_masks_for_episode(
     target_h: int,
     target_w: int,
     device: torch.device,
+    dataset_type: str = "agibot",
 ):
-    """Compute and save flow masks for one episode video."""
-    ep_dir = video_path.parent.parent
-    mask_dir = ep_dir / "flow_masks"
-    mask_dir.mkdir(exist_ok=True)
+    """Compute and save flow masks for one episode video.
+
+    AgiBot layout: {task}/{ep_id}/videos/{camera}.mp4
+      → masks saved at: {task}/{ep_id}/flow_masks/{t:06d}_skip{skip}.pt
+
+    EgoDex layout: {task_name}/{idx}.mp4
+      → masks saved at: {task_name}/flow_masks/{idx}/{t:06d}_skip{skip}.pt
+    """
+    if dataset_type == "egodex":
+        mask_dir = video_path.parent / "flow_masks" / video_path.stem
+    else:
+        mask_dir = video_path.parent.parent / "flow_masks"
+    mask_dir.mkdir(parents=True, exist_ok=True)
+
+    # Determine RAFT input size (must be divisible by 8) from first frame
+    try:
+        if _HAVE_DECORD:
+            vr_probe = decord.VideoReader(str(video_path), ctx=decord.cpu(0))
+            h, w = vr_probe[0].shape[:2]
+        else:
+            cap = cv2.VideoCapture(str(video_path))
+            h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            cap.release()
+    except Exception as e:
+        print(f"  [skip] Failed to probe {video_path}: {e}")
+        return 0
+
+    raft_h = (h // 8) * 8
+    raft_w = (w // 8) * 8
 
     try:
-        frames = load_frames_as_tensor(video_path, device)  # [N, 3, H, W]
+        # All frames on CPU; only 2 frames sent to GPU per RAFT call
+        frames = load_frames_cpu(video_path, raft_h, raft_w)
     except Exception as e:
         print(f"  [skip] Failed to load {video_path}: {e}")
         return 0
@@ -82,13 +120,6 @@ def compute_masks_for_episode(
     if n < 2:
         return 0
 
-    # Resize to RAFT input size if needed (must be divisible by 8)
-    h, w = frames.shape[2], frames.shape[3]
-    raft_h = (h // 8) * 8
-    raft_w = (w // 8) * 8
-    if raft_h != h or raft_w != w:
-        frames = F.interpolate(frames, size=(raft_h, raft_w), mode="bilinear", align_corners=False)
-
     saved = 0
     for skip in skips:
         for t in range(n - skip):
@@ -96,8 +127,9 @@ def compute_masks_for_episode(
             if mask_path.exists():
                 continue  # Already computed, skip
 
-            f0 = frames[t:t+1]       # [1, 3, H, W]
-            f1 = frames[t+skip:t+skip+1]
+            # Send only 2 frames to GPU
+            f0 = frames[t:t+1].to(device)
+            f1 = frames[t+skip:t+skip+1].to(device)
 
             with torch.no_grad():
                 # RAFT expects images in [0, 1] float, returns flow [1, 2, H, W]
@@ -129,21 +161,22 @@ def compute_masks_for_episode(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_root", default="/home/xuan/embodied-ai/data/agibotworld/extracted")
-    parser.add_argument("--camera",    default="head_color")
-    parser.add_argument("--skips",     nargs="+", type=int, default=[1, 2, 3, 4])
-    parser.add_argument("--threshold", type=float, default=1.5,
-                        help="Flow magnitude threshold in pixels (default: 1.5)")
-    parser.add_argument("--target_h",  type=int, default=240)
-    parser.add_argument("--target_w",  type=int, default=320)
-    parser.add_argument("--raft_model", default="small", choices=["small", "large"])
-    parser.add_argument("--dry_run",   action="store_true",
+    parser.add_argument("--camera",       default="head_color",
+                        help="AgiBot camera name (ignored for egodex)")
+    parser.add_argument("--skips",        nargs="+", type=int, default=[1, 2, 3, 4])
+    parser.add_argument("--threshold",    type=float, default=1.5)
+    parser.add_argument("--target_h",     type=int, default=240)
+    parser.add_argument("--target_w",     type=int, default=320)
+    parser.add_argument("--raft_model",   default="small", choices=["small", "large"])
+    parser.add_argument("--dataset_type", default="agibot", choices=["agibot", "egodex"],
+                        help="Dataset layout: agibot (task/ep/videos/cam.mp4) or egodex (task/idx.mp4)")
+    parser.add_argument("--dry_run",      action="store_true",
                         help="Process only the first 2 episodes")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
-    # Load RAFT from torchvision
     try:
         from torchvision.models.optical_flow import raft_small, raft_large, Raft_Small_Weights, Raft_Large_Weights
         if args.raft_model == "small":
@@ -153,19 +186,25 @@ def main():
         print(f"Loaded RAFT-{args.raft_model} from torchvision")
     except ImportError:
         print("ERROR: torchvision >= 0.13 required for RAFT.")
-        print("  pip install torchvision --upgrade")
         sys.exit(1)
 
     data_root = Path(args.data_root)
-    video_paths = sorted(data_root.glob(f"*/*/videos/{args.camera}.mp4"))
-    if not video_paths:
-        video_paths = sorted(data_root.glob(f"*/videos/{args.camera}.mp4"))
+
+    if args.dataset_type == "egodex":
+        # EgoDex: {task_name}/{idx}.mp4
+        video_paths = sorted(data_root.glob("*/*.mp4"))
+    else:
+        # AgiBot: {task_id}/{ep_id}/videos/{camera}.mp4
+        video_paths = sorted(data_root.glob(f"*/*/videos/{args.camera}.mp4"))
+        if not video_paths:
+            video_paths = sorted(data_root.glob(f"*/videos/{args.camera}.mp4"))
 
     if not video_paths:
-        print(f"No {args.camera}.mp4 found under {args.data_root}")
+        print(f"No videos found under {args.data_root} (dataset_type={args.dataset_type})")
         sys.exit(1)
 
-    print(f"Found {len(video_paths)} episodes, skips={args.skips}, threshold={args.threshold}")
+    print(f"Found {len(video_paths)} episodes | dataset={args.dataset_type} "
+          f"skips={args.skips} threshold={args.threshold}")
 
     if args.dry_run:
         video_paths = video_paths[:2]
@@ -173,17 +212,17 @@ def main():
 
     total_saved = 0
     for i, vp in enumerate(video_paths):
-        ep_label = "/".join(vp.parts[-4:-2])
+        ep_label = "/".join(vp.parts[-2:])
         print(f"[{i+1}/{len(video_paths)}] {ep_label} … ", end="", flush=True)
         n = compute_masks_for_episode(
             vp, raft, args.skips, args.threshold,
             args.target_h, args.target_w, device,
+            dataset_type=args.dataset_type,
         )
         print(f"{n} masks saved")
         total_saved += n
 
     print(f"\nDone. Total masks saved: {total_saved:,}")
-    print(f"Masks location: <ep_dir>/flow_masks/{{t:06d}}_skip{{skip}}.pt")
 
 
 if __name__ == "__main__":

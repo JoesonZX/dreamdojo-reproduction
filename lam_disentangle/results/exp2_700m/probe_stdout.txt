@@ -1,0 +1,26 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/exp2_700m/step_0010000 | latent_dim=40 action_part=32
+Val size: 80,509
+/home/xuan/.venv/lib/python3.10/site-packages/sklearn/linear_model/_logistic.py:473: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+Action Probe — 
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+-- Real-action regression (Ridge), R^2 (higher=more action info) --
+  full z_mu        : R2= 0.131  MSE=0.3278
+  action-sub [:32] : R2= 0.132  MSE=0.3278
+  env-sub    [32:] : R2= 0.059  MSE=0.3550
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  45.8% (chance 0.9%)  |  ep  43.9% (chance 0.34%)
+  env-sub   : task  24.1% (chance 0.9%)  |  ep  21.5% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/code/lam_disentangle/results/exp2_700m/probe.txt

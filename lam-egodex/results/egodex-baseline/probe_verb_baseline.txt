@@ -1,0 +1,9 @@
+Linear Probe Results — Baseline
+==================================================
+Verb  probe (llm_verbs):   9.0%  [chance: 1.7%,  59 classes]
+  verb classes: [np.str_('add'), np.str_('arrange'), np.str_('assemble'), np.str_('boil'), np.str_('braid'), np.str_('build'), np.str_('charge'), np.str_('clean'), np.str_('clip'), np.str_('color'), np.str_('crumple'), np.str_('deal'), np.str_('declutter'), np.str_('dry'), np.str_('flip'), np.str_('fold'), np.str_('fry'), np.str_('gather'), np.str_('insert'), np.str_('insert_remove_bookshelf'), np.str_('knead'), np.str_('load'), np.str_('lock'), np.str_('make'), np.str_('measure'), np.str_('open'), np.str_('paint'), np.str_('peel'), np.str_('pick'), np.str_('pick up'), np.str_('play'), np.str_('point'), np.str_('push'), np.str_('put'), np.str_('put away'), np.str_('rake'), np.str_('roll'), np.str_('scoop'), np.str_('screw'), np.str_('set up'), np.str_('setup'), np.str_('sleeve'), np.str_('slot'), np.str_('sort'), np.str_('stack'), np.str_('staple'), np.str_('stock'), np.str_('sweep'), np.str_('thread'), np.str_('throw'), np.str_('tie'), np.str_('type'), np.str_('use'), np.str_('wash'), np.str_('wipe'), np.str_('wrap'), np.str_('wrapping'), np.str_('write'), np.str_('zip')]
+Task  probe (task_id) :   7.0%  [chance: 0.9%,  108 classes]
+Ep    probe (ep_id)  :   11.3%  [chance: 1.41%,  71 episodes with ≥5 samples]
+
+Action/Appearance ratio: 0.80x  (mixed)
+CLEAN: latent is not contaminated by scene appearance.

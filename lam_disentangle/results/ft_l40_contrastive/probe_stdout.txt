@@ -1,0 +1,32 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive/step_0001000 | latent_dim=40 action_part=32
+Val size: 80,509
+Action Probe — ft_l40_contrastive
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.183
+  Lhand Δpos  : R2(mean)= 0.221  MSE(mean)=0.4056  per-dim R2=[0.277, 0.255, 0.132]
+  Lhand 6Drot : R2(mean)= 0.091  MSE(mean)=0.3502  per-dim R2=[0.180, 0.032, 0.080, 0.031, 0.194, 0.026]
+  Rhand Δpos  : R2(mean)= 0.315  MSE(mean)=0.2175  per-dim R2=[0.458, 0.438, 0.049]
+  Rhand 6Drot : R2(mean)= 0.189  MSE(mean)=0.2579  per-dim R2=[0.271, 0.263, 0.120, 0.262, 0.200, 0.021]
+
+[action-sub]  overall(uniform) R2= 0.184
+  Lhand Δpos  : R2(mean)= 0.228  MSE(mean)=0.4027  per-dim R2=[0.280, 0.255, 0.149]
+  Lhand 6Drot : R2(mean)= 0.094  MSE(mean)=0.3484  per-dim R2=[0.173, 0.042, 0.084, 0.040, 0.198, 0.028]
+  Rhand Δpos  : R2(mean)= 0.319  MSE(mean)=0.2164  per-dim R2=[0.461, 0.438, 0.058]
+  Rhand 6Drot : R2(mean)= 0.186  MSE(mean)=0.2592  per-dim R2=[0.263, 0.255, 0.113, 0.255, 0.202, 0.025]
+
+[env-sub]  overall(uniform) R2= 0.044
+  Lhand Δpos  : R2(mean)= 0.002  MSE(mean)=0.5262  per-dim R2=[0.018, -0.013, -0.000]
+  Lhand 6Drot : R2(mean)= 0.060  MSE(mean)=0.3646  per-dim R2=[0.181, 0.006, -0.001, 0.007, 0.176, -0.011]
+  Rhand Δpos  : R2(mean)= 0.017  MSE(mean)=0.3228  per-dim R2=[0.029, 0.027, -0.004]
+  Rhand 6Drot : R2(mean)= 0.062  MSE(mean)=0.3068  per-dim R2=[0.228, 0.009, -0.018, 0.009, 0.141, -0.000]
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  18.0% (chance 0.9%)  |  ep  15.2% (chance 0.34%)
+  env-sub   : task  13.2% (chance 0.9%)  |  ep  10.5% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/lam_disentangle/results/ft_l40_contrastive/probe.txt

@@ -1,0 +1,52 @@
+# Exp4-C — beta_a sweep: 5e-4 (gentler bottleneck than A).
+# Heavy KL on z_a[:32] (beta=1e-3) forces it to a MINIMAL code: action loss defends
+# the action info, the rest (env/appearance, needed for reconstruction) is dumped into
+# the cheap z_e[32:] (beta_env=1e-6). Goal: pure z_a WITHOUT supervising the env dims.
+model:
+  image_channels: 3
+  lam_model_dim: 512
+  lam_latent_dim: 40
+  lam_patch_size: 16
+  lam_enc_blocks: 8
+  lam_dec_blocks: 8
+  lam_num_heads: 8
+  lam_dropout: 0.0
+  beta: 5.0e-4          # = beta_action: KL weight on z_a[:32]  (bottleneck)
+  beta_env: 1.0e-6      # KL weight on z_e[32:]  (cheap, free to carry env)
+  env_dim: 8
+  action_dim: 18
+  action_head: true
+  lambda_action: 1.0
+  lambda_indep: 0.0     # NO independence loss in this arm
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-dis/exp4_kl_c/log_imgs
+
+data:
+  dataset_type: egodex
+  data_root: /home/xuan/embodied-ai/data/egodex/test_240p
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+  load_actions: true
+
+training:
+  per_gpu_batch_size: 32
+  gradient_accumulation_steps: 1
+  num_workers: 10
+  pin_memory: true
+  total_steps: 10000
+  lr: 2.5e-5
+  weight_decay: 0.01
+  warmup_steps: 1000
+  mixed_precision: bf16
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-dis/exp4_kl_c
+  save_every: 2000
+  eval_every: 1000
+  log_every: 100
+  keep_last_n: 3
+
+logging:
+  project: dreamdojo-lam-disentangle
+  run_name: dis-exp4-klC-ba5e4
+  use_wandb: false

@@ -1,0 +1,32 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive_v2_5k/step_0005000 | latent_dim=40 action_part=32
+Val size: 80,509
+Action Probe — ft_l40_contrastive_v2_5k
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.278
+  Lhand Δpos  : R2(mean)= 0.346  MSE(mean)=0.3407  per-dim R2=[0.486, 0.330, 0.221]
+  Lhand 6Drot : R2(mean)= 0.154  MSE(mean)=0.3222  per-dim R2=[0.225, 0.125, 0.130, 0.128, 0.199, 0.117]
+  Rhand Δpos  : R2(mean)= 0.434  MSE(mean)=0.1790  per-dim R2=[0.574, 0.521, 0.208]
+  Rhand 6Drot : R2(mean)= 0.290  MSE(mean)=0.2277  per-dim R2=[0.407, 0.351, 0.232, 0.348, 0.306, 0.097]
+
+[action-sub]  overall(uniform) R2= 0.280
+  Lhand Δpos  : R2(mean)= 0.352  MSE(mean)=0.3378  per-dim R2=[0.490, 0.330, 0.237]
+  Lhand 6Drot : R2(mean)= 0.152  MSE(mean)=0.3226  per-dim R2=[0.224, 0.123, 0.134, 0.126, 0.195, 0.113]
+  Rhand Δpos  : R2(mean)= 0.441  MSE(mean)=0.1775  per-dim R2=[0.570, 0.520, 0.232]
+  Rhand 6Drot : R2(mean)= 0.290  MSE(mean)=0.2274  per-dim R2=[0.412, 0.352, 0.224, 0.351, 0.301, 0.103]
+
+[env-sub]  overall(uniform) R2= 0.043
+  Lhand Δpos  : R2(mean)= 0.009  MSE(mean)=0.5219  per-dim R2=[0.013, 0.006, 0.009]
+  Lhand 6Drot : R2(mean)= 0.064  MSE(mean)=0.3623  per-dim R2=[0.189, 0.002, 0.021, 0.003, 0.165, 0.001]
+  Rhand Δpos  : R2(mean)=-0.001  MSE(mean)=0.3292  per-dim R2=[0.010, -0.004, -0.010]
+  Rhand 6Drot : R2(mean)= 0.062  MSE(mean)=0.3067  per-dim R2=[0.211, 0.007, -0.009, 0.008, 0.154, 0.002]
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  60.0% (chance 0.9%)  |  ep  53.9% (chance 0.34%)
+  env-sub   : task  25.8% (chance 0.9%)  |  ep  19.6% (chance 0.34%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/lam_disentangle/results/ft_l40_contrastive_v2_5k/probe.txt

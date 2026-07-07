@@ -1,0 +1,32 @@
+Loaded /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive_v3_5k/step_0005000 | latent_dim=40 action_part=32
+Val size: 80,509
+Action Probe — ft_l40_contrastive_v3_5k
+========================================================
+n=4000  latent_dim=40  action_part=32
+
+== Real-action regression (Ridge), PER-DIM R^2 (higher=more action info) ==
+
+[full z_mu]  overall(uniform) R2= 0.279
+  Lhand Δpos  : R2(mean)= 0.330  MSE(mean)=0.3493  per-dim R2=[0.407, 0.338, 0.246]
+  Lhand 6Drot : R2(mean)= 0.163  MSE(mean)=0.3180  per-dim R2=[0.231, 0.159, 0.119, 0.160, 0.188, 0.120]
+  Rhand Δpos  : R2(mean)= 0.447  MSE(mean)=0.1737  per-dim R2=[0.620, 0.519, 0.203]
+  Rhand 6Drot : R2(mean)= 0.286  MSE(mean)=0.2266  per-dim R2=[0.407, 0.384, 0.215, 0.382, 0.265, 0.063]
+
+[action-sub]  overall(uniform) R2= 0.281
+  Lhand Δpos  : R2(mean)= 0.352  MSE(mean)=0.3391  per-dim R2=[0.435, 0.343, 0.277]
+  Lhand 6Drot : R2(mean)= 0.157  MSE(mean)=0.3202  per-dim R2=[0.221, 0.142, 0.128, 0.143, 0.189, 0.118]
+  Rhand Δpos  : R2(mean)= 0.443  MSE(mean)=0.1750  per-dim R2=[0.622, 0.507, 0.201]
+  Rhand 6Drot : R2(mean)= 0.289  MSE(mean)=0.2251  per-dim R2=[0.404, 0.391, 0.219, 0.390, 0.261, 0.068]
+
+[env-sub]  overall(uniform) R2= 0.041
+  Lhand Δpos  : R2(mean)= 0.006  MSE(mean)=0.5231  per-dim R2=[-0.006, 0.019, 0.004]
+  Lhand 6Drot : R2(mean)= 0.059  MSE(mean)=0.3634  per-dim R2=[0.212, 0.002, 0.018, 0.003, 0.130, -0.009]
+  Rhand Δpos  : R2(mean)= 0.016  MSE(mean)=0.3238  per-dim R2=[0.021, 0.009, 0.017]
+  Rhand 6Drot : R2(mean)= 0.053  MSE(mean)=0.3088  per-dim R2=[0.182, 0.008, -0.015, 0.008, 0.144, -0.009]
+
+-- Classification matrix: subspace x target (acc / chance) --
+  action-sub: task  51.1% (chance 0.9%)  |  ep  48.7% (chance 0.34%)  |  verb  45.6% (chance 1.4%)
+  env-sub   : task  21.2% (chance 0.9%)  |  ep  17.8% (chance 0.34%)  |  verb  19.2% (chance 1.4%)
+
+Expected (good disentanglement): action-sub predicts action & task well; env-sub predicts action poorly but ep/scene comparatively better.
+Saved -> /home/xuan/embodied-ai/lam_disentangle/results/ft_l40_contrastive_v3_5k/probe.txt
