@@ -43,7 +43,7 @@ class RunSpec:
     init_from: Path | None = None
 
 
-DEFAULT_RUNS = [
+RUN_SPECS = [
     RunSpec(
         name="raw_lam",
         config=Path("code/config/ft_l32_full_5k.yaml"),
@@ -59,7 +59,28 @@ DEFAULT_RUNS = [
         config=Path("code/config/ft_l40_contrastive_v3_5k.yaml"),
         checkpoint=Path("/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive_v3_5k/step_0005000"),
     ),
+    RunSpec(
+        name="ours_a_zero_5k",
+        config=Path("code/config/ft_l40_ours_a_zero_5k.yaml"),
+        checkpoint=Path("/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k/step_0005000"),
+    ),
+    RunSpec(
+        name="ours_b_zero_reverse_5k",
+        config=Path("code/config/ft_l40_ours_b_zero_reverse_5k.yaml"),
+        checkpoint=Path("/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_b_zero_reverse_5k/step_0005000"),
+    ),
+    RunSpec(
+        name="ours_b2_zero_action_reverse_5k",
+        config=Path("code/config/ft_l40_ours_b2_zero_action_reverse_5k.yaml"),
+        checkpoint=Path("/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_b2_zero_action_reverse_5k/step_0005000"),
+    ),
+    RunSpec(
+        name="ours_c_zero_reverse_hardneg_5k",
+        config=Path("code/config/ft_l40_ours_c_zero_reverse_hardneg_5k.yaml"),
+        checkpoint=Path("/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_c_zero_reverse_hardneg_5k/step_0005000"),
+    ),
 ]
+DEFAULT_RUN_NAMES = ["raw_lam", "kl_ft_l40_full_5k", "contrastive_v3_5k"]
 
 
 def _resolve(path: Path) -> Path:
@@ -209,6 +230,52 @@ def _shortcut_metrics(z: np.ndarray, ep: List[str], action_labels: List[str]) ->
         # Positive means visual/episode shortcut is closer than same-action across episodes.
         "episode_shortcut_leakage": d_desa - d_seda,
         "action_separation_ratio": d_diff / d_desa if d_desa and not math.isnan(d_desa) else float("nan"),
+    }
+
+
+def _task_shortcut_metrics(z: np.ndarray, task: List[str], action_labels: List[str]) -> Dict[str, float]:
+    """Context shortcut diagnostic with non-empty pools on EgoDex.
+
+    Episode-level verbs make same-episode/different-action pairs rare or empty.
+    This variant asks whether same-task/different-action pairs are closer than
+    different-task/same-action pairs. Positive leakage means task/context is
+    pulling z_a more strongly than shared action.
+    """
+    task_arr = np.asarray(task)
+    act_arr = np.asarray(action_labels)
+    keep = act_arr != "unknown"
+    if keep.sum() < 20:
+        return {
+            "task_shortcut_n": int(keep.sum()),
+            "d_same_task_diff_action": float("nan"),
+            "d_diff_task_same_action": float("nan"),
+            "task_shortcut_leakage": float("nan"),
+            "task_shortcut_ratio": float("nan"),
+        }
+    z = z[keep].astype(np.float64)
+    task_arr = task_arr[keep]
+    act_arr = act_arr[keep]
+    z = z / (np.linalg.norm(z, axis=1, keepdims=True) + 1e-8)
+    d = 1.0 - z @ z.T
+    off = ~np.eye(len(z), dtype=bool)
+    same_task = task_arr[:, None] == task_arr[None, :]
+    same_action = act_arr[:, None] == act_arr[None, :]
+    same_task_diff_action = off & same_task & (~same_action)
+    diff_task_same_action = off & (~same_task) & same_action
+
+    def mean_or_nan(mask: np.ndarray) -> float:
+        return float(d[mask].mean()) if mask.any() else float("nan")
+
+    d_stda = mean_or_nan(same_task_diff_action)
+    d_dtsa = mean_or_nan(diff_task_same_action)
+    return {
+        "task_shortcut_n": int(keep.sum()),
+        "d_same_task_diff_action": d_stda,
+        "d_diff_task_same_action": d_dtsa,
+        "task_shortcut_leakage": d_dtsa - d_stda
+        if not math.isnan(d_stda) and not math.isnan(d_dtsa) else float("nan"),
+        "task_shortcut_ratio": d_stda / d_dtsa
+        if d_dtsa and not math.isnan(d_stda) and not math.isnan(d_dtsa) else float("nan"),
     }
 
 
@@ -611,6 +678,7 @@ def run_one(
     eff_rank, top5 = _effective_rank(mu)
     active_units = int((std_dim > 0.05).sum())
     shortcut = _shortcut_metrics(z_for_shortcut, data["ep"], action_labels)
+    task_shortcut = _task_shortcut_metrics(z_for_shortcut, data["task"], action_labels)
     reversible = _reversible_metrics(z_for_shortcut, data["task"], data["ep"], data["verb"])
     full_r2, action_drop, single_r2 = _ridge_action_scores(mu, data["action"])
     task_eta = _eta2_per_dim(mu, data["task"])
@@ -673,6 +741,7 @@ def run_one(
         "active_units_std_gt_0.05": active_units,
         "kl_mean_total": float(kl_dim.sum(axis=1).mean()),
         **shortcut,
+        **task_shortcut,
         **reversible,
         **camera,
         **reverse,
@@ -684,7 +753,8 @@ def _write_markdown(path: Path, summaries: List[dict]) -> None:
     keys = [
         "run", "action_r2_full_latent", "static_response_rel_median",
         "camera_shift_h_median", "camera_shift_v_median",
-        "episode_shortcut_leakage", "action_separation_ratio",
+        "episode_shortcut_leakage", "task_shortcut_leakage",
+        "action_separation_ratio",
         "rev_hard_margin", "rev_nearest_pos_beats_opp",
         "reverse_za_cos_median", "reverse_ze_cos_median",
         "effective_rank", "top5_eig_frac", "active_units_std_gt_0.05",
@@ -704,6 +774,7 @@ def _write_markdown(path: Path, summaries: List[dict]) -> None:
         "- Static response is normalized by the RMS norm of ordinary transition latents.",
         "- Camera-shift metrics are relative latent changes after applying the same zero-filled image translation to both frames.",
         "- `episode_shortcut_leakage > 0` means same-episode/different-action pairs are closer than different-episode/same-action pairs.",
+        "- `task_shortcut_leakage > 0` means same-task/different-action pairs are closer than different-task/same-action pairs.",
         "- `rev_hard_margin > 0` means same-task opposite verbs are farther than same-verb cross-episode positives.",
         "- Lower `reverse_za_cos_median` means the action subspace is more direction-sensitive; higher `reverse_ze_cos_median` means the env subspace is more time-reversal invariant.",
         "- Per-dim labels are heuristic relative rankings for triage, not claims of fixed physical semantics.",
@@ -721,11 +792,11 @@ def main() -> None:
     parser.add_argument("--perturb_scale", type=float, default=2.0)
     parser.add_argument("--device", default="auto",
                         help="Device for the benchmark, e.g. auto, cpu, cuda, cuda:0, cuda:1.")
-    parser.add_argument("--runs", nargs="*", default=[r.name for r in DEFAULT_RUNS],
-                        help="Subset of default runs: raw_lam kl_ft_l40_full_5k contrastive_v3_5k")
+    parser.add_argument("--runs", nargs="*", default=DEFAULT_RUN_NAMES,
+                        help="Run names, e.g. raw_lam kl_ft_l40_full_5k contrastive_v3_5k ours_a_zero_5k")
     args = parser.parse_args()
 
-    run_map = {r.name: r for r in DEFAULT_RUNS}
+    run_map = {r.name: r for r in RUN_SPECS}
     specs = [run_map[name] for name in args.runs]
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

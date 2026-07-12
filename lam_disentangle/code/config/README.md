@@ -30,6 +30,13 @@ scripts do not need to change.
 - `ft_l40_contrastive_v2.yaml`, `ft_l40_contrastive_v2_5k.yaml`
 - `ft_l40_contrastive_v3.yaml`, `ft_l40_contrastive_v3_5k.yaml`
 
-`v3` is the current verb-SupCon branch; the next planned branch is the
-reverse-calibrated hard-negative loss described in `../../notes/fine_grained_causal_lam_plan.md`.
+`v3` is the current verb-SupCon branch. It is kept as the contrastive baseline
+that tests whether direct semantic clustering helps or hurts action separation.
 
+## Fine-Grained Causal LAM
+
+- `ft_l40_ours_a_zero_5k.yaml`: KL trunk + zero-transition calibration.
+- `ft_l40_ours_b_zero_reverse_5k.yaml`: Ours-A + stronger temporal reverse consistency.
+- `ft_l40_ours_b2_zero_action_reverse_5k.yaml`: Ours-A + action-only temporal reverse. This tests whether removing the env reverse constraint avoids context leakage while preserving action direction sensitivity.
+- `ft_l40_ours_c_zero_reverse_hardneg_5k.yaml`: Ours-B + phase-aware semantic reversible hard-negative contrast. Positive/negative labels come from resolved verbs; local motion and temporal position only soft-weight likely core-action frame pairs.
+- `ft_l40_ours_c_zero_reverse_hardneg_fg_5k.yaml`: Ours-C plus SAM3 hand/object/contact reconstruction weights. Requires `sam3_hoc_masks`.

@@ -5,7 +5,8 @@ instead of reading files alphabetically.
 
 ## Start Here
 
-- [HANDOFF.md](HANDOFF.md): current state, best results, code changes, and next steps.
+- [CURRENT_HANDOFF_2026_07_11.md](CURRENT_HANDOFF_2026_07_11.md): current state, migration plan, active experiments, and next steps.
+- [HANDOFF.md](HANDOFF.md): older handoff for the earlier ConLA/contrastive phase.
 - [fine_grained_causal_lam_plan.md](fine_grained_causal_lam_plan.md): forward plan for reverse-calibrated fine-grained LAM.
 - [stage1_lam_side_audit.md](stage1_lam_side_audit.md): Stage 1 audit metrics, commands, and interpretation.
 
@@ -35,4 +36,3 @@ The CD-LAM PDFs are kept locally under this directory but are ignored by git:
 
 - `Causal_Debiased_LAM.pdf`
 - `Causal_Debiased_LAM (18).pdf`
-

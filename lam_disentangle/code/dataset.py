@@ -16,7 +16,7 @@ produced the image pair (after the clamp/fallback logic), and is z-scored with
 dataset-level mean/std cached to disk so train/eval share identical normalization.
 
 Sample (with load_actions): {"videos":[2,H,W,C], "task_id":str, "ep_id":str,
-                             "action": float32[18]}
+                             "phase_pos": float, "action": float32[18]}
 """
 
 import random
@@ -306,7 +306,12 @@ class EgoDexDataset(Dataset):
         return cv2.resize(frame, (self.img_w, self.img_h), interpolation=cv2.INTER_AREA)
 
     def _load_fg_mask(self, video_path: Path, t: int, skip: int):
-        subdir = "sam3_masks" if self.fg_mask_type == "sam3" else "flow_masks"
+        if self.fg_mask_type == "sam3":
+            subdir = "sam3_masks"
+        elif self.fg_mask_type in {"sam3_hoc", "sam3_hoc_masks"}:
+            subdir = "sam3_hoc_masks"
+        else:
+            subdir = "flow_masks"
         mask_dir  = video_path.parent / subdir / video_path.stem
         mask_path = mask_dir / f"{t:06d}_skip{skip}.pt"
         if mask_path.exists():
@@ -337,7 +342,14 @@ class EgoDexDataset(Dataset):
             fallback = random.randint(0, len(self) - 1)
             return self.__getitem__(fallback)
 
-        item = {"videos": videos, "task_id": task_id, "ep_id": ep_id}
+        phase_pos = float(t + 0.5 * skip) / float(max(1, n - 1))
+        item = {
+            "videos": videos,
+            "task_id": task_id,
+            "ep_id": ep_id,
+            "phase_pos": torch.tensor(phase_pos, dtype=torch.float32),
+            "pair_skip": torch.tensor(skip, dtype=torch.long),
+        }
         if self.load_verbs:
             verb = self._verb_map.get(ep_id)
             item["verb_id"] = verb if verb is not None else "unknown"

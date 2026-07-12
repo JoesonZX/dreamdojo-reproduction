@@ -44,6 +44,7 @@ from accelerate.utils import set_seed        # noqa: E402
 # ── Losses ────────────────────────────────────────────────────────────────────
 
 def lam_loss(outputs, gt_future, beta, fg_mask=None, fg_weight=5.0,
+             fg_channel_weights=None,
              action_part=None, beta_env=None):
     """VAE loss: (optionally fg-weighted) MSE + KL.
 
@@ -56,7 +57,16 @@ def lam_loss(outputs, gt_future, beta, fg_mask=None, fg_weight=5.0,
     """
     err = (gt_future - outputs["recon"]) ** 2
     if fg_mask is not None:
-        w = 1.0 + (fg_weight - 1.0) * fg_mask.float().unsqueeze(1).unsqueeze(-1)
+        if fg_mask.ndim == 4:
+            weights = fg_channel_weights or [fg_weight] * fg_mask.shape[1]
+            weight_tensor = torch.tensor(
+                weights, device=fg_mask.device, dtype=torch.float32,
+            ).view(1, -1, 1, 1)
+            mask_weight = (fg_mask.float() * weight_tensor).amax(dim=1)
+            mask_weight = torch.maximum(mask_weight, torch.ones_like(mask_weight))
+        else:
+            mask_weight = 1.0 + (fg_weight - 1.0) * fg_mask.float()
+        w = mask_weight.unsqueeze(1).unsqueeze(-1)
         mse = (w * err).mean()
     else:
         mse = err.mean()
@@ -108,6 +118,168 @@ def supcon_loss(feats, labels, tau=0.1):
         return feats.sum() * 0.0
     mean_log_prob_pos = (pos_mask * log_prob).sum(1)[valid] / pos_counts[valid]
     return -mean_log_prob_pos.mean()
+
+
+def zero_transition_loss(z_static, z_delta, margin=0.05):
+    """Calibrate duplicated-frame inputs to a near-zero latent reference.
+
+    The ordinary-transition RMS is stop-gradient so this pulls static pairs down
+    without shrinking all motion latents.
+    """
+    static_norm = torch.linalg.norm(z_static, dim=1)
+    delta_rms = torch.sqrt((torch.linalg.norm(z_delta, dim=1) ** 2).mean()).detach()
+    return F.relu(static_norm / (delta_rms + 1e-8) - margin).pow(2).mean()
+
+
+def reverse_consistency_loss(z_mu, z_rev, action_part, env_dim,
+                             action_target_cos=-0.2, env_target_cos=0.8,
+                             env_weight=1.0):
+    """Stronger temporal reverse cue on raw latent subspaces.
+
+    Reversed frame pairs should change the action subspace direction while
+    leaving the env subspace comparatively stable. We use margins instead of a
+    hard -1 target because many manipulation transitions are not pure
+    anti-parallel translations.
+    """
+    za = F.normalize(z_mu[:, :action_part], dim=1)
+    za_rev = F.normalize(z_rev[:, :action_part], dim=1)
+    za_cos = (za * za_rev).sum(1)
+    l_action = F.relu(za_cos - action_target_cos).mean()
+    if env_dim > 0 and env_weight > 0:
+        ze = F.normalize(z_mu[:, action_part:], dim=1)
+        ze_rev = F.normalize(z_rev[:, action_part:], dim=1)
+        ze_cos = (ze * ze_rev).sum(1)
+        l_env = env_weight * F.relu(env_target_cos - ze_cos).mean()
+    else:
+        l_env = z_mu.sum() * 0.0
+    return l_action + l_env
+
+
+def _opposite_verb_map():
+    pairs = [
+        ("insert", "remove"), ("assemble", "disassemble"),
+        ("stack", "unstack"), ("charge", "uncharge"),
+        ("open", "close"), ("screw", "unscrew"),
+        ("tie", "untie"), ("zip", "unzip"),
+        ("fold", "unfold"), ("stock", "unstock"),
+        ("pick", "put"), ("scoop", "dump"),
+        ("lock", "unlock"), ("add", "remove"),
+        ("wrap", "unwrap"), ("push", "pull"),
+    ]
+    out = {}
+    for a, b in pairs:
+        out[a] = b
+        out[b] = a
+    return out
+
+
+def _core_action_weights(actions, phase_pos=None, rotation_scale=0.5,
+                         motion_floor=0.2, temporal_floor=0.6,
+                         motion_temp=1.0):
+    """Softly upweight likely core-manipulation frame pairs.
+
+    This is not a data filter. All samples remain in reconstruction/action losses;
+    these weights only reduce semantic-contrast pressure on ambiguous approach or
+    retreat transitions. The 18D action is z-scored, so translation and rotation
+    magnitudes are interpreted as relative within the dataset.
+    """
+    a = actions.float()
+    left_trans, left_rot = a[:, :3], a[:, 3:9]
+    right_trans, right_rot = a[:, 9:12], a[:, 12:18]
+    trans_norm = torch.linalg.norm(left_trans, dim=1) + torch.linalg.norm(right_trans, dim=1)
+    rot_norm = torch.linalg.norm(left_rot, dim=1) + torch.linalg.norm(right_rot, dim=1)
+    motion_score = trans_norm + rotation_scale * rot_norm
+
+    center = motion_score.median().detach()
+    spread = (motion_score - center).abs().median().detach().clamp_min(1e-4)
+    motion_w = torch.sigmoid((motion_score - center) / (motion_temp * spread))
+    motion_w = motion_floor + (1.0 - motion_floor) * motion_w
+
+    if phase_pos is None:
+        return motion_w
+    phase = phase_pos.to(actions.device).float().clamp(0.0, 1.0)
+    middle_prior = 1.0 - (2.0 * phase - 1.0).abs()
+    temporal_w = temporal_floor + (1.0 - temporal_floor) * middle_prior
+    return motion_w * temporal_w
+
+
+def hard_negative_sigmoid_loss(z_a, actions, verbs, tasks, eps, phase_pos=None,
+                               tau=0.1, core_rotation_scale=0.5,
+                               core_motion_floor=0.2, core_temporal_floor=0.6,
+                               core_motion_temp=1.0,
+                               require_same_task_negative=True,
+                               return_stats=False):
+    """Phase-aware semantic hard-negative contrast for reversible primitives.
+
+    Semantics decide the pair label:
+      positive: same resolved reversible verb, different episode
+      negative: opposite resolved verbs, preferably in the same task context
+
+    Local motion does NOT decide positive/negative membership because opposite
+    manipulations can have similar hand trajectories. It only gives a soft core
+    weight, reducing contrast pressure on approach/retreat or ambiguous samples.
+    """
+    device = z_a.device
+    B = z_a.shape[0]
+    zero = z_a.sum() * 0.0
+    if B < 2:
+        if return_stats:
+            return zero, {
+                "pairs": zero.detach(), "pos_pairs": zero.detach(),
+                "neg_pairs": zero.detach(), "core_weight": zero.detach(),
+            }
+        return zero
+    z = F.normalize(z_a, dim=1)
+    sim = z @ z.T
+    self_mask = torch.eye(B, dtype=torch.bool, device=device)
+
+    norm_verbs = [str(v).strip().lower().replace("_", " ") for v in verbs]
+    opp = _opposite_verb_map()
+    known = torch.tensor([v != "unknown" and v in opp for v in norm_verbs],
+                         dtype=torch.bool, device=device)
+    same_verb = torch.tensor([[norm_verbs[i] == norm_verbs[j] for j in range(B)] for i in range(B)],
+                             dtype=torch.bool, device=device)
+    opposite = torch.tensor([[opp.get(norm_verbs[i]) == norm_verbs[j] for j in range(B)] for i in range(B)],
+                            dtype=torch.bool, device=device)
+    same_task = torch.tensor([[tasks[i] == tasks[j] for j in range(B)] for i in range(B)],
+                             dtype=torch.bool, device=device)
+    same_ep = torch.tensor([[eps[i] == eps[j] for j in range(B)] for i in range(B)],
+                           dtype=torch.bool, device=device)
+
+    valid_pair = known[:, None] & known[None, :] & ~self_mask
+    pos = valid_pair & same_verb & ~same_ep
+    neg = valid_pair & opposite
+    if require_same_task_negative:
+        neg = neg & same_task
+    pair_mask = pos | neg
+    if pair_mask.sum() == 0:
+        if return_stats:
+            return zero, {
+                "pairs": zero.detach(), "pos_pairs": pos.sum().float().detach(),
+                "neg_pairs": neg.sum().float().detach(), "core_weight": zero.detach(),
+            }
+        return zero
+    y = torch.where(pos[pair_mask], torch.ones((), device=device), -torch.ones((), device=device))
+    logits = sim[pair_mask] / tau
+    core_w = _core_action_weights(
+        actions.to(device),
+        phase_pos=phase_pos,
+        rotation_scale=core_rotation_scale,
+        motion_floor=core_motion_floor,
+        temporal_floor=core_temporal_floor,
+        motion_temp=core_motion_temp,
+    )
+    pair_w = (core_w[:, None] * core_w[None, :])[pair_mask]
+    per_pair = F.softplus(-y * logits)
+    loss = (pair_w * per_pair).sum() / pair_w.sum().clamp_min(1e-8)
+    if return_stats:
+        return loss, {
+            "pairs": pair_mask.sum().float().detach(),
+            "pos_pairs": pos.sum().float().detach(),
+            "neg_pairs": neg.sum().float().detach(),
+            "core_weight": core_w.mean().detach(),
+        }
+    return loss
 
 
 # ── Checkpoint helpers ──────────────────────────────────────────────────────────
@@ -263,6 +435,21 @@ def main():
     supcon_tau      = mcfg.get("supcon_tau", 0.1)
     contrastive_warmup = mcfg.get("contrastive_warmup", 0)   # ramp supcon+temporal 0->target
     use_contrastive = contrastive and (lambda_supcon > 0 or lambda_temporal > 0)
+    # ── Fine-grained causal LAM flags (KL trunk + targeted causal losses) ──
+    lambda_zero = mcfg.get("lambda_zero", 0.0)
+    zero_margin = mcfg.get("zero_margin", 0.05)
+    lambda_reverse = mcfg.get("lambda_reverse", 0.0)
+    reverse_warmup = mcfg.get("reverse_warmup", 0)
+    reverse_action_target_cos = mcfg.get("reverse_action_target_cos", -0.2)
+    reverse_env_target_cos = mcfg.get("reverse_env_target_cos", 0.8)
+    reverse_env_weight = mcfg.get("reverse_env_weight", 1.0)
+    lambda_hardneg = mcfg.get("lambda_hardneg", 0.0)
+    hardneg_tau = mcfg.get("hardneg_tau", 0.1)
+    hardneg_core_rotation_scale = mcfg.get("hardneg_core_rotation_scale", 0.5)
+    hardneg_core_motion_floor = mcfg.get("hardneg_core_motion_floor", 0.2)
+    hardneg_core_temporal_floor = mcfg.get("hardneg_core_temporal_floor", 0.6)
+    hardneg_core_motion_temp = mcfg.get("hardneg_core_motion_temp", 1.0)
+    hardneg_same_task_negative = mcfg.get("hardneg_same_task_negative", True)
     load_actions  = dcfg.get("load_actions", False) or use_action
 
     # ── Model ─────────────────────────────────────────────────────────────────
@@ -286,6 +473,8 @@ def main():
     beta_warmup = mcfg.get("beta_warmup", 0)     # anneal beta_a from beta_env -> beta over N steps (0=off)
     use_fg    = fgcfg.get("use_fg_loss", False)
     fg_weight = fgcfg.get("fg_weight", 5.0)
+    fg_mask_type = fgcfg.get("fg_mask_type", "raft")
+    fg_channel_weights = fgcfg.get("fg_channel_weights", None)
     action_part = model.action_part
     use_split_kl = beta_env is not None and env_dim > 0
 
@@ -294,7 +483,8 @@ def main():
         f"action_head={use_action} (lambda_action={lambda_action}) | "
         f"indep={use_indep} (lambda_indep={lambda_indep}) | "
         f"split_kl={use_split_kl} (beta_a={beta}, beta_e={beta_env}) | "
-        f"contrastive={use_contrastive} (supcon={lambda_supcon}, temporal={lambda_temporal}, tau={supcon_tau})"
+        f"contrastive={use_contrastive} (supcon={lambda_supcon}, temporal={lambda_temporal}, tau={supcon_tau}) | "
+        f"causal(zero={lambda_zero}, reverse={lambda_reverse}, hardneg={lambda_hardneg})"
     )
     accelerator.print(f"Model params: {sum(p.numel() for p in model.parameters())/1e6:.1f}M")
 
@@ -317,7 +507,11 @@ def main():
         raise ValueError("This experiment package supports dataset_type=egodex only.")
 
     # Verbs needed if we group/contrast by the scene-independent action verb.
-    need_verbs = dcfg.get("load_verbs", False) or dcfg.get("pk_label", "task") == "verb"
+    need_verbs = (
+        dcfg.get("load_verbs", False)
+        or dcfg.get("pk_label", "task") == "verb"
+        or lambda_hardneg > 0
+    )
     supcon_label_key = "verb_id" if dcfg.get("pk_label", "task") == "verb" else "task_id"
 
     train_ds = EgoDexDataset(
@@ -329,6 +523,7 @@ def main():
         val_ratio=dcfg.get("val_ratio", 0.1),
         seed=dcfg.get("seed", 42),
         use_fg_mask=use_fg,
+        fg_mask_type=fg_mask_type,
         load_actions=load_actions,
         action_dim=action_dim if load_actions else 18,
         load_verbs=need_verbs,
@@ -421,6 +616,8 @@ def main():
     model.train()
     train_iter = iter(train_loader)
     r_loss = r_mse = r_kl = r_act = r_ind = r_sup = r_tmp = 0.0
+    r_zero = r_rev = r_hneg = 0.0
+    r_hneg_pairs = r_hneg_pos = r_hneg_neg = r_hneg_core = 0.0
 
     accelerator.print(f"Starting training from step {global_step} -> {total_steps}")
 
@@ -443,6 +640,7 @@ def main():
             else:
                 beta_a_eff = beta
             loss, mse, kl = lam_loss(outputs, gt_future, beta_a_eff, fg_mask, fg_weight,
+                                     fg_channel_weights=fg_channel_weights,
                                      action_part=action_part if use_split_kl else None,
                                      beta_env=beta_env if use_split_kl else None)
 
@@ -459,6 +657,46 @@ def main():
                 # warmup: ramp the independence weight 0 -> lambda_indep over indep_warmup steps
                 w = lambda_indep * (min(1.0, global_step / indep_warmup) if indep_warmup > 0 else 1.0)
                 loss = loss + w * l_ind
+
+            l_zero = torch.tensor(0.0, device=loss.device)
+            if lambda_zero > 0:
+                static_videos = batch["videos"].clone()
+                static_videos[:, 1] = static_videos[:, 0]
+                static_out = accelerator.unwrap_model(model).encode(static_videos)
+                l_zero = zero_transition_loss(static_out["z_mu"], outputs["z_mu"], zero_margin)
+                loss = loss + lambda_zero * l_zero
+
+            l_rev = torch.tensor(0.0, device=loss.device)
+            if lambda_reverse > 0:
+                rev_out_raw = accelerator.unwrap_model(model).encode(batch["videos"].flip(dims=[1]))
+                l_rev = reverse_consistency_loss(
+                    outputs["z_mu"], rev_out_raw["z_mu"], action_part, env_dim,
+                    action_target_cos=reverse_action_target_cos,
+                    env_target_cos=reverse_env_target_cos,
+                    env_weight=reverse_env_weight,
+                )
+                rw = lambda_reverse * (min(1.0, global_step / reverse_warmup) if reverse_warmup > 0 else 1.0)
+                loss = loss + rw * l_rev
+
+            l_hneg = torch.tensor(0.0, device=loss.device)
+            hneg_stats = None
+            if lambda_hardneg > 0:
+                l_hneg, hneg_stats = hard_negative_sigmoid_loss(
+                    outputs["z_mu"][:, :action_part],
+                    batch["action"].to(loss.device).float(),
+                    batch.get("verb_id", ["unknown"] * outputs["z_mu"].shape[0]),
+                    batch.get("task_id", ["?"] * outputs["z_mu"].shape[0]),
+                    batch.get("ep_id", ["?"] * outputs["z_mu"].shape[0]),
+                    phase_pos=batch.get("phase_pos", None),
+                    tau=hardneg_tau,
+                    core_rotation_scale=hardneg_core_rotation_scale,
+                    core_motion_floor=hardneg_core_motion_floor,
+                    core_temporal_floor=hardneg_core_temporal_floor,
+                    core_motion_temp=hardneg_core_motion_temp,
+                    require_same_task_negative=hardneg_same_task_negative,
+                    return_stats=True,
+                )
+                loss = loss + lambda_hardneg * l_hneg
 
             # ── ConLA contrastive disentanglement (replaces the KL separator) ──
             l_sup = torch.tensor(0.0, device=loss.device)
@@ -503,6 +741,12 @@ def main():
             r_loss += loss.item(); r_mse += mse.item(); r_kl += kl.item()
             r_act += l_act.item();  r_ind += l_ind.item()
             r_sup += l_sup.item();  r_tmp += l_tmp.item()
+            r_zero += l_zero.item(); r_rev += l_rev.item(); r_hneg += l_hneg.item()
+            if hneg_stats is not None:
+                r_hneg_pairs += hneg_stats["pairs"].item()
+                r_hneg_pos += hneg_stats["pos_pairs"].item()
+                r_hneg_neg += hneg_stats["neg_pairs"].item()
+                r_hneg_core += hneg_stats["core_weight"].item()
 
             if global_step % log_every == 0 and accelerator.is_main_process:
                 avg = 1.0 / log_every
@@ -510,7 +754,13 @@ def main():
                     "train/loss": r_loss * avg, "train/mse": r_mse * avg,
                     "train/kl": r_kl * avg, "train/action": r_act * avg,
                     "train/indep": r_ind * avg, "train/supcon": r_sup * avg,
-                    "train/temporal": r_tmp * avg, "train/lr": scheduler.get_last_lr()[0],
+                    "train/temporal": r_tmp * avg, "train/zero": r_zero * avg,
+                    "train/reverse": r_rev * avg, "train/hardneg": r_hneg * avg,
+                    "train/hardneg_pairs": r_hneg_pairs * avg,
+                    "train/hardneg_pos_pairs": r_hneg_pos * avg,
+                    "train/hardneg_neg_pairs": r_hneg_neg * avg,
+                    "train/hardneg_core_weight": r_hneg_core * avg,
+                    "train/lr": scheduler.get_last_lr()[0],
                     "global_step": global_step,
                 }
                 extra = ""
@@ -520,6 +770,16 @@ def main():
                     extra += f"| indep {metrics['train/indep']:.4f} "
                 if use_contrastive:
                     extra += f"| supcon {metrics['train/supcon']:.4f} | temp {metrics['train/temporal']:.4f} "
+                if lambda_zero > 0:
+                    extra += f"| zero {metrics['train/zero']:.4f} "
+                if lambda_reverse > 0:
+                    extra += f"| rev {metrics['train/reverse']:.4f} "
+                if lambda_hardneg > 0:
+                    extra += (
+                        f"| hneg {metrics['train/hardneg']:.4f} "
+                        f"(pairs {metrics['train/hardneg_pairs']:.1f}, "
+                        f"neg {metrics['train/hardneg_neg_pairs']:.1f}) "
+                    )
                 accelerator.print(
                     f"step {global_step:6d} | loss {metrics['train/loss']:.4f} "
                     f"| mse {metrics['train/mse']:.4f} | kl {metrics['train/kl']:.6f} "
@@ -528,6 +788,8 @@ def main():
                 if lcfg.get("use_wandb"):
                     accelerator.log(metrics, step=global_step)
                 r_loss = r_mse = r_kl = r_act = r_ind = r_sup = r_tmp = 0.0
+                r_zero = r_rev = r_hneg = 0.0
+                r_hneg_pairs = r_hneg_pos = r_hneg_neg = r_hneg_core = 0.0
 
             if global_step % eval_every == 0:
                 model.eval()
