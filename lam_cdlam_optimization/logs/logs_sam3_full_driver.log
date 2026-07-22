@@ -1,0 +1,50 @@
+[2026-07-20 12:57:26] full precompute -> sam3_hoc_frames  across 3 GPU(s): 1 2 3
+  videos: 3243   already done: 4
+  shard 0 -> GPU 1  (log: logs/sam3_hoc/shard0_gpu1.log)
+  shard 1 -> GPU 2  (log: logs/sam3_hoc/shard1_gpu2.log)
+  shard 2 -> GPU 3  (log: logs/sam3_hoc/shard2_gpu3.log)
+[2026-07-21 06:32:36] done. episodes: 3247
+  size: 15G	total
+  NO-OBJECT episodes: 1285
+  FAILED   episodes: 0
+=== tasks by NO-OBJECT count (fix these nouns, then re-run with --task X --overwrite):
+    148 vertical_pick_place
+     83 insert_remove_furniture_bench_cabinet
+     65 scoop_dump_ice
+     58 charge_uncharge_airpods
+     56 basic_pick_place
+     54 insert_remove_usb
+     50 assemble_disassemble_furniture_bench_stool
+     43 stack
+     42 insert_remove_airpods
+     41 tie_untie_rubberband
+     41 open_close_insert_remove_tupperware
+     41 insert_remove_plug_socket
+     30 zip_unzip_bag
+     26 dry_hands
+     26 assemble_disassemble_furniture_bench_lamp
+     25 insert_remove_utensils
+     22 play_reset_connect_four
+     21 stock_unstock_fridge
+     20 throw_collect_objects
+     20 rake_smooth_zen_garden
+     20 lock_unlock_key
+     20 assemble_disassemble_furniture_bench_chair
+     18 knead_slime
+     17 zip_unzip_case
+     17 insert_remove_shirt_in_tube
+     16 gather_roll_dice
+     13 wrap
+     12 declutter_desk
+     12 color
+     11 thread_unthread_bead_necklace
+     11 stack_unstack_tupperware
+     11 slot_batteries
+     11 screw_unscrew_fingers_fixture
+     11 screw_unscrew_allen_fixture
+     10 wrap_unwrap_food
+      9 peel_place_sticker
+      9 clean_tableware
+      8 load_dispense_ice
+      7 make_sandwich
+      7 clean_surface

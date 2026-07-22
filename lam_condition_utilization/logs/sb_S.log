@@ -1,0 +1,27 @@
+The following values were not passed to `accelerate launch` and had defaults used instead:
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+/home/xuan/.venv/lib/python3.10/site-packages/accelerate/utils/launch.py:236: UserWarning: Port `29500` is already in use. Accelerate will attempt to launch in a standalone-like mode by finding an open port automatically for this session. If this current attempt fails, or for more control in future runs, please specify a different port (e.g., `--main_process_port <your_chosen_port>`) or use `--main_process_port 0` for automatic selection in your launch command or Accelerate config file.
+  warnings.warn(
+latent_dim=40 action_part=32 env_dim=8 | action_head=True (lambda_action=1.0) | indep=False (lambda_indep=0.0) | split_kl=True (beta_a=0.003, beta_e=1e-06) | contrastive=False (supcon=0.0, temporal=0.0, tau=0.1) | causal(zero=0.1, reverse=0.0, hardneg=0.0, opposite=0.0, pctr=0.0) | recon=1.0 | use=0.0 | dir=0.1 (kind=CONTROL, n=2, target=-0.2)
+Model params: 709.8M
+[init_from] LAM_400k.ckpt: loaded 836/843 tensors
+[init_from] shape-mismatch skipped (3): fc.weight(64, 1024)->(80, 1024), fc.bias(64,)->(80,), action_up.weight(1024, 32)->(1024, 40)
+[init_from] left random-init (7): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight, action_up.weight, fc.bias, fc.weight
+[manifest] excluding frozen eval episodes: /home/xuan/embodied-ai/lam_disentangle/data/eval_manifest.json
+Train pairs: 624,133  Val pairs: 80,509
+[dir] 138,100 pairs (kind=MATCHED CONTROL) from /home/xuan/embodied-ai/lam_disentangle/data/dir_pairs_train.npz
+[lr] warmup=200 total=300 num_processes=2 (schedule expressed in global steps)
+Starting training from step 0 -> 300
+step     50 | loss 0.8539 | mse 0.0059 | kl 3.590571 | act 0.8029 | zero 0.3298 | dir 0.7042 (za_cos +0.503, act 0.98) | lr 2.50e-06
+step    100 | loss 0.8425 | mse 0.0021 | kl 2.327414 | act 0.8245 | zero 0.0137 | dir 0.6152 (za_cos +0.415, act 1.00) | lr 5.00e-06
+step    150 | loss 0.9100 | mse 0.0010 | kl 2.414349 | act 0.8851 | zero 0.0108 | dir 0.6784 (za_cos +0.468, act 0.94) | lr 7.50e-06
+step    200 | loss 0.9307 | mse 0.0009 | kl 4.516244 | act 0.8935 | zero 0.0248 | dir 0.6234 (za_cos +0.405, act 0.93) | lr 1.00e-05
+step    250 | loss 0.9771 | mse 0.0010 | kl 7.018575 | act 0.9208 | zero 0.0196 | dir 0.7549 (za_cos +0.541, act 0.94) | lr 5.00e-06
+step    300 | loss 1.2179 | mse 0.0011 | kl 10.232513 | act 1.1512 | zero 0.0057 | dir 0.6700 (za_cos +0.453, act 0.89) | lr 0.00e+00
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_sb_S/step_0000300
+Training complete.
+[rank0]:[W720 10:56:40.549802892 ProcessGroupNCCL.cpp:1553] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

@@ -1,0 +1,42 @@
+
+[sb_B] ft_l40_sb_B/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00053 E_same=0.00063 E_opp=0.00063 E_zero=0.00073 E_shuf=0.00063
+  raw(E_opp-E_same)=+2.98e-06  c_persist=-0.0012  Rout=0.01022 (fg=0.01814)
+  usage_zero=+0.5311 usage_shuf=+0.0453  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.74 (act=9.31 env=0.43)  active_dims=40 (act=32/32)  eff_rank_a=9.6
+       sep(same,opp)/noise=1.946 (sep=1.946 noise=1.000) snr_act_mean=0.541  n_rev_tasks=64
+
+[sb_R] ft_l40_sb_R/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00054 E_same=0.00063 E_opp=0.00063 E_zero=0.00070 E_shuf=0.00063
+  raw(E_opp-E_same)=+1.98e-06  c_persist=-0.0217  Rout=0.01040 (fg=0.01804)
+  usage_zero=+0.3678 usage_shuf=+0.0200  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.01 (act=8.54 env=0.47)  active_dims=40 (act=32/32)  eff_rank_a=10.3
+       sep(same,opp)/noise=1.803 (sep=1.804 noise=1.001) snr_act_mean=0.521  n_rev_tasks=64
+
+[sb_D] ft_l40_sb_D/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00053 E_same=0.00063 E_opp=0.00063 E_zero=0.00070 E_shuf=0.00063
+  raw(E_opp-E_same)=+3.78e-06  c_persist=-0.0125  Rout=0.01078 (fg=0.01902)
+  usage_zero=+0.3876 usage_shuf=+0.0484  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.30 (act=8.84 env=0.47)  active_dims=40 (act=32/32)  eff_rank_a=10.0
+       sep(same,opp)/noise=1.847 (sep=1.847 noise=1.000) snr_act_mean=0.536  n_rev_tasks=64
+
+[sb_U] ft_l40_sb_U/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00165 E_same=0.00174 E_opp=0.00174 E_zero=0.00300 E_shuf=0.00171
+  raw(E_opp-E_same)=+1.35e-06  c_persist=-0.0922  Rout=0.02162 (fg=0.03205)
+  usage_zero=+4.5551 usage_shuf=-1.8983  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.84 (act=9.31 env=0.53)  active_dims=40 (act=32/32)  eff_rank_a=9.6
+       sep(same,opp)/noise=1.949 (sep=1.945 noise=0.998) snr_act_mean=0.542  n_rev_tasks=64
+
+[sb_S] ft_l40_sb_S/step_0000300
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00067 E_same=0.00071 E_opp=0.00072 E_zero=0.00084 E_shuf=0.00072
+  raw(E_opp-E_same)=+8.29e-06  c_persist=+0.0153  Rout=0.01168 (fg=0.01712)
+  usage_zero=+0.4654 usage_shuf=-0.1571  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=6.43 (act=5.90 env=0.53)  active_dims=40 (act=32/32)  eff_rank_a=7.9
+       sep(same,opp)/noise=1.462 (sep=1.463 noise=1.001) snr_act_mean=0.345  n_rev_tasks=64
+
+wrote results/stage_b_h2_decompose.json

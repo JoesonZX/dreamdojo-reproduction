@@ -1,0 +1,377 @@
+{
+  "own": {
+    "episodes": 200,
+    "has_any": 0.99,
+    "has_ge6": 0.99,
+    "frac_anti_mean": 0.30264460713175895,
+    "n_anti_median": 547.0,
+    "min_cos_median": -0.999699048246453,
+    "n_gated_median": 61.0,
+    "cos_pct": {
+      "p1": -0.9892605491591271,
+      "p5": -0.9374710164833162,
+      "p25": -0.5639990512185642,
+      "p50": 0.023127801676294153
+    }
+  },
+  "world": {
+    "episodes": 200,
+    "has_any": 0.99,
+    "has_ge6": 0.99,
+    "frac_anti_mean": 0.31720100461903,
+    "n_anti_median": 537.5,
+    "min_cos_median": -0.9996039963306254,
+    "n_gated_median": 61.0,
+    "cos_pct": {
+      "p1": -0.9922590296138623,
+      "p5": -0.9515480187745933,
+      "p25": -0.6018702076021973,
+      "p50": 0.00649670288033188
+    }
+  },
+  "cam": {
+    "episodes": 200,
+    "has_any": 0.99,
+    "has_ge6": 0.99,
+    "frac_anti_mean": 0.31798932756403714,
+    "n_anti_median": 539.0,
+    "min_cos_median": -0.9997438700584179,
+    "n_gated_median": 61.0,
+    "cos_pct": {
+      "p1": -0.9922289662668445,
+      "p5": -0.9516549730291521,
+      "p25": -0.6020912275986887,
+      "p50": 0.008020373583686723
+    }
+  },
+  "cam_raw": {
+    "episodes": 200,
+    "has_any": 0.99,
+    "has_ge6": 0.99,
+    "frac_anti_mean": 0.3152618333702115,
+    "n_anti_median": 524.5,
+    "min_cos_median": -0.9997299389180088,
+    "n_gated_median": 61.0,
+    "cos_pct": {
+      "p1": -0.9916741481075411,
+      "p5": -0.9492262655167156,
+      "p25": -0.5955905042702511,
+      "p50": 0.003993131368589723
+    }
+  },
+  "camera_residual_rel_median": 0.1829230403900801,
+  "_config": {
+    "n_episodes": 200,
+    "skip": 1,
+    "mag_pct": 60.0,
+    "cos_thresh": -0.5,
+    "seed": 42,
+    "out": "results/dir_pair_audit.json"
+  },
+  "_per_task_cam": {
+    "color": {
+      "frac_anti_mean": 0.24431488352136493,
+      "n_anti_median": 9680.0
+    },
+    "insert_remove_plug_socket": {
+      "frac_anti_mean": 0.26903082890351765,
+      "n_anti_median": 188.0
+    },
+    "insert_remove_cups_from_rack": {
+      "frac_anti_mean": 0.3134247201092682,
+      "n_anti_median": 873.0
+    },
+    "assemble_disassemble_furniture_bench_lamp": {
+      "frac_anti_mean": 0.08999297578778735,
+      "n_anti_median": 20.0
+    },
+    "write": {
+      "frac_anti_mean": 0.21967787114845938,
+      "n_anti_median": 1662.5
+    },
+    "clean_surface": {
+      "frac_anti_mean": 0.4284313725490196,
+      "n_anti_median": 2949.0
+    },
+    "insert_remove_furniture_bench_round_table": {
+      "frac_anti_mean": 0.2,
+      "n_anti_median": 119.0
+    },
+    "play_piano": {
+      "frac_anti_mean": 0.3376750700280112,
+      "n_anti_median": 2411.0
+    },
+    "basic_pick_place": {
+      "frac_anti_mean": 0.33524067931219154,
+      "n_anti_median": 280.0
+    },
+    "open_close_insert_remove_tupperware": {
+      "frac_anti_mean": 0.37971014492753624,
+      "n_anti_median": 393.0
+    },
+    "load_dispense_ice": {
+      "frac_anti_mean": 0.3225421874125772,
+      "n_anti_median": 7726.0
+    },
+    "use_rubiks_cube": {
+      "frac_anti_mean": 0.28445881523856903,
+      "n_anti_median": 48.0
+    },
+    "insert_remove_utensils": {
+      "frac_anti_mean": 0.32911058301943835,
+      "n_anti_median": 5015.0
+    },
+    "stack": {
+      "frac_anti_mean": 0.2278649530823444,
+      "n_anti_median": 73.0
+    },
+    "screw_unscrew_bottle_cap": {
+      "frac_anti_mean": 0.3086829836829837,
+      "n_anti_median": 194.0
+    },
+    "dry_hands": {
+      "frac_anti_mean": 0.4553221288515406,
+      "n_anti_median": 3554.0
+    },
+    "push_pop_toy": {
+      "frac_anti_mean": 0.3105121293800539,
+      "n_anti_median": 1728.0
+    },
+    "stack_remove_jenga": {
+      "frac_anti_mean": 0.3231632527364235,
+      "n_anti_median": 298.5
+    },
+    "stack_unstack_plates": {
+      "frac_anti_mean": 0.39867304581298624,
+      "n_anti_median": 298.5
+    },
+    "stack_unstack_bowls": {
+      "frac_anti_mean": 0.301874539482722,
+      "n_anti_median": 386.0
+    },
+    "assemble_disassemble_furniture_bench_drawer": {
+      "frac_anti_mean": 0.32454517266568916,
+      "n_anti_median": 208.0
+    },
+    "scoop_dump_ice": {
+      "frac_anti_mean": 0.26613685276892507,
+      "n_anti_median": 110.0
+    },
+    "assemble_disassemble_furniture_bench_chair": {
+      "frac_anti_mean": 0.31799995404834114,
+      "n_anti_median": 123.5
+    },
+    "assemble_disassemble_soft_legos": {
+      "frac_anti_mean": 0.26330275229357797,
+      "n_anti_median": 189420.0
+    },
+    "zip_unzip_case": {
+      "frac_anti_mean": 0.30811217767739507,
+      "n_anti_median": 837.0
+    },
+    "vertical_pick_place": {
+      "frac_anti_mean": 0.43803499178561367,
+      "n_anti_median": 154.0
+    },
+    "fold_unfold_paper_basic": {
+      "frac_anti_mean": 0.34367934224049335,
+      "n_anti_median": 3344.0
+    },
+    "basic_fold": {
+      "frac_anti_mean": 0.2724546543355464,
+      "n_anti_median": 3766.0
+    },
+    "slot_batteries": {
+      "frac_anti_mean": 0.3432980746750232,
+      "n_anti_median": 3574.5
+    },
+    "insert_remove_drawer": {
+      "frac_anti_mean": 0.3388094064923333,
+      "n_anti_median": 207.0
+    },
+    "gather_roll_dice": {
+      "frac_anti_mean": 0.3006889763779528,
+      "n_anti_median": 2444.0
+    },
+    "point_and_click_remote": {
+      "frac_anti_mean": 0.294187675070028,
+      "n_anti_median": 2100.5
+    },
+    "tie_and_untie_shoelace": {
+      "frac_anti_mean": 0.3051611990950226,
+      "n_anti_median": 689.5
+    },
+    "thread_unthread_bead_necklace": {
+      "frac_anti_mean": 0.42521008403361343,
+      "n_anti_median": 3133.0
+    },
+    "braid_unbraid": {
+      "frac_anti_mean": 0.30525516979700246,
+      "n_anti_median": 9654.0
+    },
+    "charge_uncharge_device": {
+      "frac_anti_mean": 0.2630523949549841,
+      "n_anti_median": 126.5
+    },
+    "zip_unzip_bag": {
+      "frac_anti_mean": 0.31565893389266236,
+      "n_anti_median": 582.0
+    },
+    "put_in_take_out_glasses": {
+      "frac_anti_mean": 0.29371255254731293,
+      "n_anti_median": 1800.0
+    },
+    "insert_remove_airpods": {
+      "frac_anti_mean": 0.3478818207955161,
+      "n_anti_median": 1699.5
+    },
+    "charge_uncharge_airpods": {
+      "frac_anti_mean": 0.38036479212718394,
+      "n_anti_median": 175.0
+    },
+    "rake_smooth_zen_garden": {
+      "frac_anti_mean": 0.28071895424836607,
+      "n_anti_median": 1843.0
+    },
+    "pour": {
+      "frac_anti_mean": 0.3376879729203181,
+      "n_anti_median": 255.0
+    },
+    "assemble_disassemble_furniture_bench_stool": {
+      "frac_anti_mean": 0.3022960817025017,
+      "n_anti_median": 1019.0
+    },
+    "pick_place_food": {
+      "frac_anti_mean": 0.3100601738944458,
+      "n_anti_median": 172.0
+    },
+    "build_unstack_lego": {
+      "frac_anti_mean": 0.2543808511367923,
+      "n_anti_median": 7418.0
+    },
+    "assemble_disassemble_furniture_bench_square_table": {
+      "frac_anti_mean": 0.4019075970469159,
+      "n_anti_median": 87.0
+    },
+    "assemble_disassemble_furniture_bench_desk": {
+      "frac_anti_mean": 0.26801346801346804,
+      "n_anti_median": 398.0
+    },
+    "clean_tableware": {
+      "frac_anti_mean": 0.24023023843683813,
+      "n_anti_median": 2212.0
+    },
+    "pick_up_and_put_down_case_or_bag": {
+      "frac_anti_mean": 0.2973389355742297,
+      "n_anti_median": 2123.0
+    },
+    "peel_place_sticker": {
+      "frac_anti_mean": 0.2681506038361354,
+      "n_anti_median": 5662.0
+    },
+    "insert_remove_furniture_bench_cabinet": {
+      "frac_anti_mean": 0.3334736170604801,
+      "n_anti_median": 228.0
+    },
+    "fold_unfold_paper_origami": {
+      "frac_anti_mean": 0.29922969187675075,
+      "n_anti_median": 2136.5
+    },
+    "throw_and_catch_ball": {
+      "frac_anti_mean": 0.40252100840336136,
+      "n_anti_median": 2874.0
+    },
+    "insert_remove_usb": {
+      "frac_anti_mean": 0.38441889416517355,
+      "n_anti_median": 1630.0
+    },
+    "insert_remove_bagging": {
+      "frac_anti_mean": 0.30057269158375366,
+      "n_anti_median": 2491.0
+    },
+    "knead_slime": {
+      "frac_anti_mean": 0.3605354975118379,
+      "n_anti_median": 8542.5
+    },
+    "insert_remove_tennis_ball": {
+      "frac_anti_mean": 0.36560622476115434,
+      "n_anti_median": 3712.0
+    },
+    "make_sandwich": {
+      "frac_anti_mean": 0.274786442546156,
+      "n_anti_median": 4986.0
+    },
+    "put_toothpaste_on_toothbrush": {
+      "frac_anti_mean": 0.3233012358192663,
+      "n_anti_median": 8293.0
+    },
+    "add_remove_lid": {
+      "frac_anti_mean": 0.386892177589852,
+      "n_anti_median": 366.0
+    },
+    "wrap": {
+      "frac_anti_mean": 0.16939775910364147,
+      "n_anti_median": 1209.5
+    },
+    "assemble_disassemble_structures": {
+      "frac_anti_mean": 0.24515240904621435,
+      "n_anti_median": 6233.0
+    },
+    "sweep_dustpan": {
+      "frac_anti_mean": 0.32072829131652664,
+      "n_anti_median": 2290.0
+    },
+    "fold_stack_unstack_unfold_cloths": {
+      "frac_anti_mean": 0.2618276691671128,
+      "n_anti_median": 81187.0
+    },
+    "stack_unstack_cups": {
+      "frac_anti_mean": 0.44946236559139785,
+      "n_anti_median": 209.0
+    },
+    "play_reset_connect_four": {
+      "frac_anti_mean": 0.3953030558605794,
+      "n_anti_median": 278.0
+    },
+    "wipe_kitchen_surfaces": {
+      "frac_anti_mean": 0.31677153395530483,
+      "n_anti_median": 27740.0
+    },
+    "assemble_disassemble_legos": {
+      "frac_anti_mean": 0.31024508907560305,
+      "n_anti_median": 582.0
+    },
+    "tie_untie_rubberband": {
+      "frac_anti_mean": 0.41396090632583926,
+      "n_anti_median": 1089.0
+    },
+    "screw_unscrew_allen_fixture": {
+      "frac_anti_mean": 0.30431985294117647,
+      "n_anti_median": 9933.0
+    },
+    "setup_cleanup_table": {
+      "frac_anti_mean": 0.35423469216009695,
+      "n_anti_median": 42093.0
+    },
+    "wipe_screen": {
+      "frac_anti_mean": 0.3800275482093664,
+      "n_anti_median": 2759.0
+    },
+    "insert_dump_blocks": {
+      "frac_anti_mean": 0.28405657602737894,
+      "n_anti_median": 10624.0
+    },
+    "sort_beads": {
+      "frac_anti_mean": 0.28697478991596637,
+      "n_anti_median": 2049.0
+    },
+    "play_mancala": {
+      "frac_anti_mean": 0.4208574357935775,
+      "n_anti_median": 33249.0
+    },
+    "deal_gather_cards": {
+      "frac_anti_mean": 0.2665266106442577,
+      "n_anti_median": 1903.0
+    }
+  }
+}

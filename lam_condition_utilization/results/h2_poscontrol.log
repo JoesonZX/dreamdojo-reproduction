@@ -1,0 +1,34 @@
+pool N=1500  anchors=840
+
+=== donor 方案排序统计(18D 动作距离) ===
+  verb    n= 840  d_same=2.371 d_opp=2.350  frac(d_same<d_opp)=0.488
+  dist    n= 840  d_same=1.178 d_opp=4.201  frac(d_same<d_opp)=1.000
+  random  n= 840  d_same=2.309 d_opp=2.468  frac(d_same<d_opp)=0.550
+
+=== frame-delta ORACLE(已知强可控,无模型)C_pooled ===
+  oracle × verb     C_pooled=+0.0345  (median +0.0234)
+  oracle × dist     C_pooled=+1.1487  (median +0.9845)
+  oracle × random   C_pooled=+0.0645  (median +0.0435)
+
+=== LAM sb_B(ft_l40_sb_B)C_pooled ===
+  sb_B × verb     C_pooled=+0.0056  (median -0.0018, raw +2.98e-06)
+  sb_B × dist     C_pooled=+0.0390  (median -0.0675, raw +2.09e-05)
+  sb_B × random   C_pooled=+0.0140  (median +0.0093, raw +7.48e-06)
+
+=== LAM sb_R(ft_l40_sb_R)C_pooled ===
+  sb_R × verb     C_pooled=+0.0037  (median -0.0018, raw +1.98e-06)
+  sb_R × dist     C_pooled=+0.0322  (median -0.0883, raw +1.72e-05)
+  sb_R × random   C_pooled=+0.0112  (median +0.0094, raw +5.99e-06)
+
+=== LAM sb_D(ft_l40_sb_D)C_pooled ===
+  sb_D × verb     C_pooled=+0.0071  (median -0.0008, raw +3.78e-06)
+  sb_D × dist     C_pooled=+0.0462  (median -0.0934, raw +2.47e-05)
+  sb_D × random   C_pooled=+0.0107  (median +0.0096, raw +5.75e-06)
+
+=== 判读(C_pooled)===
+  ✅ scorer 灵敏:oracle×dist=+1.1487 ≫0, oracle×random=+0.0645≈0, oracle×verb=+0.0345
+     sb_B×dist C_pooled=+0.0390  → 真实 utilization deficit
+     sb_R×dist C_pooled=+0.0322  → 真实 utilization deficit
+     sb_D×dist C_pooled=+0.0462  → 真实 utilization deficit
+
+wrote results/stage_b_h2_poscontrol.json

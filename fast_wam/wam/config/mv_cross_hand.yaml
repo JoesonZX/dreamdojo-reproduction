@@ -1,0 +1,43 @@
+# Arm L3 -- cross-view + hand-pose anchoring (the 'egocentric annotation' arm). NOTE: its loss consumes the hand action, so the action probe is a diagnostic for THIS arm, not a headline.
+#
+model:
+  image_channels: 3
+  model_dim: 1024
+  latent_dim: 32
+  patch_size: 16
+  enc_blocks: 24
+  dec_blocks: 24
+  num_heads: 16
+  dropout: 0.0
+  num_views: 0
+data:
+  processed_root: /home/xuan/embodied-ai/data/egoexo4d_mv240
+  mode: cross
+  view_pairs: exo_exo
+  img_h: 240
+  img_w: 320
+  downsample_factors:
+  - 1
+  - 2
+  val_ratio: 0.05
+  split_seed: 42
+  pairs_per_take: 64
+loss:
+  beta: 1.0e-06
+  lambda_cross: 1.0
+  lambda_hand: 0.1
+training:
+  seed: 42
+  per_gpu_batch_size: 8
+  gradient_accumulation_steps: 1
+  num_workers: 8
+  total_steps: 10000
+  lr: 2.5e-05
+  weight_decay: 0.01
+  warmup_steps: 200
+  mixed_precision: bf16
+  log_every: 50
+  eval_every: 1000
+  save_every: 1000
+  keep_last_n: 1
+  output_dir: /home/xuan/embodied-ai/fast_wam/checkpoints/mv_cross_hand

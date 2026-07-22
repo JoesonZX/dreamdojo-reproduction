@@ -1,0 +1,5 @@
+[device] cuda:0
+[idm_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_idm_5k/step_0005000
+[idm_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 1 run(s) -> results/lam_benchmark_stage0_idm/summary.md
+[done] wrote results/lam_benchmark_stage0_idm/summary.md and per-dim CSVs

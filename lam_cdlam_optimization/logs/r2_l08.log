@@ -1,0 +1,130 @@
+nohup: ignoring input
+[run] ours-r2-opp-l08 -> /home/xuan/embodied-ai/lam_disentangle/code/config/ft_l40_ours_r2_opp_l08_5k.yaml
+The following values were not passed to `accelerate launch` and had defaults used instead:
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+latent_dim=40 action_part=32 env_dim=8 | action_head=True (lambda_action=1.0) | indep=False (lambda_indep=0.0) | split_kl=True (beta_a=0.003, beta_e=1e-06) | contrastive=False (supcon=0.0, temporal=0.0, tau=0.1) | causal(zero=0.1, reverse=0.0, hardneg=0.0, opposite=0.8)
+Model params: 709.8M
+[init_from] LAM_400k.ckpt: loaded 836/843 tensors
+[init_from] shape-mismatch skipped (3): fc.weight(64, 1024)->(80, 1024), fc.bias(64,)->(80,), action_up.weight(1024, 32)->(1024, 40)
+[init_from] left random-init (7): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight, action_up.weight, fc.bias, fc.weight
+Train pairs: 739,559  Val pairs: 80,509
+PK sampler [task]: P=2 x K=4 (batch 8) over 107 classes
+Starting training from step 0 -> 5000
+step     50 | loss 1.3228 | mse 0.0058 | kl 3.615911 | act 1.2685 | zero 0.3360 | opp 0.1668 (margin 0.002, anchors 4.5) | lr 2.50e-06
+step    100 | loss 0.8803 | mse 0.0016 | kl 2.435783 | act 0.8453 | zero 0.0303 | opp 0.2086 (margin 0.010, anchors 4.1) | lr 5.00e-06
+step    150 | loss 0.9561 | mse 0.0011 | kl 2.875182 | act 0.9126 | zero 0.0432 | opp 0.1507 (margin -0.028, anchors 3.7) | lr 7.50e-06
+step    200 | loss 0.9313 | mse 0.0008 | kl 2.743939 | act 0.8694 | zero 0.0949 | opp 0.1593 (margin 0.042, anchors 4.1) | lr 1.00e-05
+step    250 | loss 1.0350 | mse 0.0010 | kl 4.296155 | act 0.9532 | zero 0.0746 | opp 0.1722 (margin -0.052, anchors 4.4) | lr 1.00e-05
+step    300 | loss 1.0165 | mse 0.0008 | kl 5.474796 | act 0.9190 | zero 0.0680 | opp 0.1710 (margin -0.024, anchors 3.9) | lr 9.99e-06
+step    350 | loss 1.6799 | mse 0.0010 | kl 9.307255 | act 1.5772 | zero 0.0398 | opp 0.1391 (margin 0.031, anchors 4.1) | lr 9.98e-06
+step    400 | loss 1.0536 | mse 0.0011 | kl 11.132733 | act 0.9086 | zero 0.0506 | opp 0.1806 (margin -0.001, anchors 4.5) | lr 9.96e-06
+step    450 | loss 1.2601 | mse 0.0009 | kl 10.580737 | act 1.1130 | zero 0.0702 | opp 0.1609 (margin -0.011, anchors 4.5) | lr 9.93e-06
+step    500 | loss 0.9483 | mse 0.0008 | kl 10.177162 | act 0.7862 | zero 0.0591 | opp 0.1672 (margin -0.041, anchors 4.1) | lr 9.90e-06
+[val] step    500 | loss 0.0339 | mse 0.0007 | psnr 31.28 dB
+step    550 | loss 1.3958 | mse 0.0009 | kl 15.153642 | act 1.1956 | zero 0.0325 | opp 0.1905 (margin -0.005, anchors 3.8) | lr 9.87e-06
+step    600 | loss 0.9415 | mse 0.0008 | kl 11.804434 | act 0.7692 | zero 0.0584 | opp 0.1648 (margin 0.003, anchors 4.5) | lr 9.83e-06
+step    650 | loss 1.0224 | mse 0.0009 | kl 12.642723 | act 0.8557 | zero 0.0328 | opp 0.1578 (margin 0.009, anchors 4.0) | lr 9.78e-06
+step    700 | loss 1.4435 | mse 0.0008 | kl 15.118178 | act 1.2592 | zero 0.0457 | opp 0.1692 (margin 0.012, anchors 4.5) | lr 9.73e-06
+step    750 | loss 0.7441 | mse 0.0008 | kl 15.018373 | act 0.5460 | zero 0.0236 | opp 0.1896 (margin -0.026, anchors 3.9) | lr 9.68e-06
+step    800 | loss 1.2790 | mse 0.0009 | kl 16.442391 | act 1.1151 | zero 0.0203 | opp 0.1422 (margin 0.009, anchors 4.0) | lr 9.62e-06
+step    850 | loss 0.9365 | mse 0.0007 | kl 15.809318 | act 0.7346 | zero 0.0447 | opp 0.1890 (margin 0.016, anchors 3.9) | lr 9.55e-06
+step    900 | loss 1.2666 | mse 0.0008 | kl 17.118031 | act 1.0456 | zero 0.0346 | opp 0.2094 (margin -0.001, anchors 4.3) | lr 9.48e-06
+step    950 | loss 1.0517 | mse 0.0008 | kl 15.744058 | act 0.8723 | zero 0.0420 | opp 0.1614 (margin 0.035, anchors 3.9) | lr 9.41e-06
+step   1000 | loss 0.7562 | mse 0.0007 | kl 15.234722 | act 0.5774 | zero 0.0342 | opp 0.1633 (margin -0.004, anchors 4.3) | lr 9.33e-06
+[val] step   1000 | loss 0.0637 | mse 0.0007 | psnr 31.62 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0001000
+step   1050 | loss 1.5610 | mse 0.0008 | kl 18.597817 | act 1.3836 | zero 0.0161 | opp 0.1518 (margin -0.019, anchors 4.8) | lr 9.25e-06
+step   1100 | loss 1.1146 | mse 0.0006 | kl 19.270635 | act 0.9071 | zero 0.0253 | opp 0.1858 (margin 0.005, anchors 4.0) | lr 9.16e-06
+step   1150 | loss 1.1258 | mse 0.0007 | kl 17.229363 | act 0.9440 | zero 0.0269 | opp 0.1610 (margin 0.005, anchors 4.1) | lr 9.06e-06
+step   1200 | loss 0.7886 | mse 0.0007 | kl 19.097910 | act 0.6134 | zero 0.0176 | opp 0.1468 (margin 0.006, anchors 4.7) | lr 8.97e-06
+step   1250 | loss 1.2315 | mse 0.0008 | kl 19.196737 | act 1.0542 | zero 0.0129 | opp 0.1496 (margin 0.051, anchors 3.9) | lr 8.87e-06
+step   1300 | loss 1.0897 | mse 0.0008 | kl 24.208925 | act 0.8825 | zero 0.0223 | opp 0.1675 (margin 0.011, anchors 4.1) | lr 8.76e-06
+step   1350 | loss 0.8123 | mse 0.0008 | kl 19.428995 | act 0.6341 | zero 0.0219 | opp 0.1491 (margin 0.007, anchors 3.9) | lr 8.65e-06
+step   1400 | loss 0.8339 | mse 0.0008 | kl 21.250601 | act 0.6654 | zero 0.0167 | opp 0.1306 (margin 0.020, anchors 4.1) | lr 8.54e-06
+step   1450 | loss 1.0855 | mse 0.0009 | kl 21.479137 | act 0.8802 | zero 0.0115 | opp 0.1764 (margin -0.002, anchors 4.1) | lr 8.42e-06
+step   1500 | loss 0.8413 | mse 0.0009 | kl 22.253688 | act 0.6708 | zero 0.0156 | opp 0.1297 (margin -0.009, anchors 4.6) | lr 8.30e-06
+[val] step   1500 | loss 0.0585 | mse 0.0007 | psnr 31.77 dB
+step   1550 | loss 0.9819 | mse 0.0007 | kl 21.336529 | act 0.7703 | zero 0.0178 | opp 0.1841 (margin -0.052, anchors 4.6) | lr 8.17e-06
+step   1600 | loss 0.9271 | mse 0.0008 | kl 22.868043 | act 0.7482 | zero 0.0145 | opp 0.1381 (margin 0.005, anchors 3.5) | lr 8.04e-06
+step   1650 | loss 0.8134 | mse 0.0007 | kl 22.523744 | act 0.6336 | zero 0.0162 | opp 0.1405 (margin 0.009, anchors 4.2) | lr 7.91e-06
+step   1700 | loss 0.9021 | mse 0.0007 | kl 19.379899 | act 0.7367 | zero 0.0269 | opp 0.1323 (margin 0.021, anchors 4.0) | lr 7.78e-06
+step   1750 | loss 0.8797 | mse 0.0007 | kl 20.073695 | act 0.6945 | zero 0.0187 | opp 0.1560 (margin -0.004, anchors 4.2) | lr 7.64e-06
+step   1800 | loss 0.9743 | mse 0.0007 | kl 21.416962 | act 0.7571 | zero 0.0202 | opp 0.1909 (margin -0.001, anchors 4.0) | lr 7.50e-06
+step   1850 | loss 0.7564 | mse 0.0007 | kl 20.640638 | act 0.5544 | zero 0.0163 | opp 0.1749 (margin 0.009, anchors 4.2) | lr 7.36e-06
+step   1900 | loss 1.2065 | mse 0.0007 | kl 20.968072 | act 0.9767 | zero 0.0192 | opp 0.2081 (margin 0.009, anchors 4.2) | lr 7.21e-06
+step   1950 | loss 1.0021 | mse 0.0007 | kl 21.275358 | act 0.8206 | zero 0.0285 | opp 0.1459 (margin 0.025, anchors 4.1) | lr 7.06e-06
+step   2000 | loss 0.6442 | mse 0.0006 | kl 19.127616 | act 0.4613 | zero 0.0183 | opp 0.1563 (margin 0.048, anchors 4.2) | lr 6.91e-06
+[val] step   2000 | loss 0.0650 | mse 0.0006 | psnr 31.99 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0002000
+step   2050 | loss 0.6600 | mse 0.0006 | kl 19.577239 | act 0.4851 | zero 0.0180 | opp 0.1445 (margin 0.001, anchors 4.1) | lr 6.76e-06
+step   2100 | loss 0.9226 | mse 0.0007 | kl 26.159970 | act 0.7170 | zero 0.0090 | opp 0.1604 (margin 0.003, anchors 4.1) | lr 6.61e-06
+step   2150 | loss 1.1314 | mse 0.0007 | kl 24.240964 | act 0.9128 | zero 0.0177 | opp 0.1825 (margin -0.004, anchors 4.2) | lr 6.45e-06
+step   2200 | loss 0.9735 | mse 0.0007 | kl 23.890175 | act 0.7623 | zero 0.0080 | opp 0.1757 (margin 0.041, anchors 4.0) | lr 6.29e-06
+step   2250 | loss 0.6232 | mse 0.0006 | kl 18.540608 | act 0.4347 | zero 0.0177 | opp 0.1657 (margin 0.009, anchors 4.2) | lr 6.14e-06
+step   2300 | loss 0.9979 | mse 0.0006 | kl 21.653178 | act 0.7614 | zero 0.0175 | opp 0.2144 (margin -0.062, anchors 4.0) | lr 5.98e-06
+step   2350 | loss 0.9842 | mse 0.0008 | kl 24.238229 | act 0.7793 | zero 0.0077 | opp 0.1665 (margin 0.011, anchors 4.1) | lr 5.81e-06
+step   2400 | loss 0.8553 | mse 0.0008 | kl 22.478725 | act 0.6770 | zero 0.0178 | opp 0.1384 (margin 0.014, anchors 4.2) | lr 5.65e-06
+step   2450 | loss 1.1093 | mse 0.0007 | kl 25.082037 | act 0.9027 | zero 0.0149 | opp 0.1645 (margin 0.003, anchors 3.8) | lr 5.49e-06
+step   2500 | loss 1.2116 | mse 0.0007 | kl 30.182898 | act 0.9977 | zero 0.0065 | opp 0.1562 (margin 0.019, anchors 4.3) | lr 5.33e-06
+[val] step   2500 | loss 0.1013 | mse 0.0006 | psnr 32.27 dB
+step   2550 | loss 0.5675 | mse 0.0006 | kl 16.819494 | act 0.4077 | zero 0.0171 | opp 0.1359 (margin 0.034, anchors 4.4) | lr 5.16e-06
+step   2600 | loss 1.0191 | mse 0.0007 | kl 26.945204 | act 0.7884 | zero 0.0085 | opp 0.1890 (margin 0.019, anchors 3.9) | lr 5.00e-06
+step   2650 | loss 0.9240 | mse 0.0007 | kl 23.786740 | act 0.7183 | zero 0.0089 | opp 0.1691 (margin 0.024, anchors 4.5) | lr 4.84e-06
+step   2700 | loss 1.0198 | mse 0.0007 | kl 31.498772 | act 0.8124 | zero 0.0066 | opp 0.1434 (margin 0.006, anchors 4.1) | lr 4.67e-06
+step   2750 | loss 0.8465 | mse 0.0006 | kl 19.669127 | act 0.6622 | zero 0.0111 | opp 0.1571 (margin -0.002, anchors 3.9) | lr 4.51e-06
+step   2800 | loss 1.1611 | mse 0.0007 | kl 26.212288 | act 0.9529 | zero 0.0093 | opp 0.1635 (margin 0.031, anchors 4.3) | lr 4.35e-06
+step   2850 | loss 1.2231 | mse 0.0008 | kl 27.983599 | act 1.0093 | zero 0.0060 | opp 0.1641 (margin -0.003, anchors 4.4) | lr 4.19e-06
+step   2900 | loss 0.9954 | mse 0.0006 | kl 28.314728 | act 0.7742 | zero 0.0133 | opp 0.1717 (margin 0.036, anchors 4.3) | lr 4.02e-06
+step   2950 | loss 0.9141 | mse 0.0007 | kl 25.608899 | act 0.6921 | zero 0.0109 | opp 0.1826 (margin -0.015, anchors 4.2) | lr 3.86e-06
+step   3000 | loss 0.6744 | mse 0.0006 | kl 18.066283 | act 0.4981 | zero 0.0112 | opp 0.1532 (margin -0.009, anchors 4.4) | lr 3.71e-06
+[val] step   3000 | loss 0.0935 | mse 0.0006 | psnr 32.39 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0003000
+step   3050 | loss 0.8279 | mse 0.0006 | kl 25.252986 | act 0.5984 | zero 0.0064 | opp 0.1945 (margin 0.025, anchors 4.0) | lr 3.55e-06
+step   3100 | loss 0.7122 | mse 0.0006 | kl 22.476141 | act 0.5122 | zero 0.0122 | opp 0.1666 (margin -0.022, anchors 4.0) | lr 3.39e-06
+step   3150 | loss 1.0254 | mse 0.0006 | kl 20.156649 | act 0.8113 | zero 0.0092 | opp 0.1930 (margin -0.014, anchors 3.8) | lr 3.24e-06
+step   3200 | loss 0.7525 | mse 0.0006 | kl 18.292763 | act 0.5578 | zero 0.0102 | opp 0.1753 (margin 0.000, anchors 4.1) | lr 3.09e-06
+step   3250 | loss 0.8200 | mse 0.0008 | kl 26.004431 | act 0.6241 | zero 0.0056 | opp 0.1493 (margin 0.011, anchors 3.7) | lr 2.94e-06
+step   3300 | loss 0.8434 | mse 0.0006 | kl 21.069319 | act 0.6619 | zero 0.0113 | opp 0.1487 (margin 0.052, anchors 4.0) | lr 2.79e-06
+step   3350 | loss 1.0178 | mse 0.0008 | kl 26.365869 | act 0.7870 | zero 0.0091 | opp 0.1912 (margin -0.017, anchors 4.6) | lr 2.64e-06
+step   3400 | loss 0.8594 | mse 0.0007 | kl 21.800532 | act 0.6491 | zero 0.0062 | opp 0.1825 (margin -0.010, anchors 4.0) | lr 2.50e-06
+step   3450 | loss 0.8532 | mse 0.0007 | kl 23.738744 | act 0.6601 | zero 0.0043 | opp 0.1543 (margin 0.007, anchors 4.7) | lr 2.36e-06
+step   3500 | loss 1.0140 | mse 0.0007 | kl 28.797830 | act 0.8016 | zero 0.0039 | opp 0.1602 (margin 0.013, anchors 4.2) | lr 2.22e-06
+[val] step   3500 | loss 0.0880 | mse 0.0006 | psnr 32.18 dB
+step   3550 | loss 0.9028 | mse 0.0007 | kl 25.393303 | act 0.7041 | zero 0.0116 | opp 0.1542 (margin 0.003, anchors 4.2) | lr 2.09e-06
+step   3600 | loss 0.9008 | mse 0.0007 | kl 27.619059 | act 0.6834 | zero 0.0090 | opp 0.1700 (margin 0.027, anchors 3.9) | lr 1.96e-06
+step   3650 | loss 1.0410 | mse 0.0006 | kl 24.056356 | act 0.8578 | zero 0.0035 | opp 0.1410 (margin -0.012, anchors 4.2) | lr 1.83e-06
+step   3700 | loss 0.6765 | mse 0.0006 | kl 21.423757 | act 0.4959 | zero 0.0030 | opp 0.1472 (margin 0.049, anchors 3.7) | lr 1.70e-06
+step   3750 | loss 0.6583 | mse 0.0006 | kl 24.435935 | act 0.4592 | zero 0.0057 | opp 0.1591 (margin 0.056, anchors 4.2) | lr 1.58e-06
+step   3800 | loss 1.1114 | mse 0.0007 | kl 29.749442 | act 0.9090 | zero 0.0028 | opp 0.1441 (margin -0.011, anchors 3.8) | lr 1.46e-06
+step   3850 | loss 0.8024 | mse 0.0006 | kl 27.579472 | act 0.6090 | zero 0.0035 | opp 0.1409 (margin -0.024, anchors 3.7) | lr 1.35e-06
+step   3900 | loss 0.7981 | mse 0.0007 | kl 23.843065 | act 0.6108 | zero 0.0040 | opp 0.1467 (margin 0.033, anchors 4.0) | lr 1.24e-06
+step   3950 | loss 0.7892 | mse 0.0007 | kl 21.844902 | act 0.5803 | zero 0.0066 | opp 0.1807 (margin 0.007, anchors 4.1) | lr 1.13e-06
+step   4000 | loss 0.9572 | mse 0.0006 | kl 26.328075 | act 0.7720 | zero 0.0055 | opp 0.1350 (margin 0.025, anchors 3.6) | lr 1.03e-06
+[val] step   4000 | loss 0.1055 | mse 0.0006 | psnr 32.40 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0004000
+step   4050 | loss 0.9631 | mse 0.0007 | kl 27.777157 | act 0.7648 | zero 0.0046 | opp 0.1460 (margin 0.001, anchors 4.3) | lr 9.36e-07
+step   4100 | loss 1.2293 | mse 0.0006 | kl 21.952747 | act 1.0275 | zero 0.0044 | opp 0.1719 (margin -0.007, anchors 3.9) | lr 8.43e-07
+step   4150 | loss 0.9048 | mse 0.0006 | kl 21.848393 | act 0.6992 | zero 0.0058 | opp 0.1768 (margin -0.011, anchors 4.0) | lr 7.54e-07
+step   4200 | loss 1.1450 | mse 0.0007 | kl 29.159319 | act 0.9369 | zero 0.0029 | opp 0.1535 (margin 0.035, anchors 4.7) | lr 6.70e-07
+step   4250 | loss 0.6687 | mse 0.0006 | kl 21.864011 | act 0.4892 | zero 0.0029 | opp 0.1443 (margin 0.031, anchors 4.4) | lr 5.90e-07
+step   4300 | loss 1.2352 | mse 0.0008 | kl 27.325562 | act 1.0003 | zero 0.0035 | opp 0.1936 (margin -0.017, anchors 4.3) | lr 5.16e-07
+step   4350 | loss 0.7692 | mse 0.0007 | kl 25.189177 | act 0.5621 | zero 0.0022 | opp 0.1669 (margin -0.020, anchors 4.4) | lr 4.46e-07
+step   4400 | loss 0.9089 | mse 0.0007 | kl 26.621809 | act 0.6992 | zero 0.0029 | opp 0.1651 (margin -0.021, anchors 4.4) | lr 3.81e-07
+step   4450 | loss 0.8861 | mse 0.0006 | kl 23.548974 | act 0.6881 | zero 0.0017 | opp 0.1614 (margin 0.030, anchors 3.9) | lr 3.20e-07
+step   4500 | loss 0.6982 | mse 0.0006 | kl 22.924386 | act 0.5122 | zero 0.0013 | opp 0.1487 (margin -0.008, anchors 3.6) | lr 2.65e-07
+[val] step   4500 | loss 0.0937 | mse 0.0006 | psnr 32.51 dB
+step   4550 | loss 1.9003 | mse 0.0006 | kl 24.068699 | act 1.6889 | zero 0.0017 | opp 0.1763 (margin 0.027, anchors 4.3) | lr 2.15e-07
+step   4600 | loss 0.6519 | mse 0.0006 | kl 22.025763 | act 0.4810 | zero 0.0022 | opp 0.1331 (margin -0.028, anchors 4.1) | lr 1.70e-07
+step   4650 | loss 0.8035 | mse 0.0007 | kl 27.793059 | act 0.5983 | zero 0.0012 | opp 0.1552 (margin 0.003, anchors 4.1) | lr 1.31e-07
+step   4700 | loss 0.8908 | mse 0.0006 | kl 26.515084 | act 0.7026 | zero 0.0018 | opp 0.1385 (margin 0.028, anchors 4.5) | lr 9.61e-08
+step   4750 | loss 0.8572 | mse 0.0007 | kl 27.929534 | act 0.6651 | zero 0.0015 | opp 0.1381 (margin 0.011, anchors 3.8) | lr 6.68e-08
+step   4800 | loss 1.0756 | mse 0.0007 | kl 22.859003 | act 0.9082 | zero 0.0008 | opp 0.1257 (margin 0.020, anchors 4.1) | lr 4.28e-08
+step   4850 | loss 0.8617 | mse 0.0006 | kl 18.789978 | act 0.6820 | zero 0.0020 | opp 0.1559 (margin 0.053, anchors 3.8) | lr 2.41e-08
+step   4900 | loss 0.6985 | mse 0.0007 | kl 22.888930 | act 0.5115 | zero 0.0025 | opp 0.1501 (margin -0.024, anchors 3.9) | lr 1.07e-08
+step   4950 | loss 0.7537 | mse 0.0006 | kl 19.720138 | act 0.5647 | zero 0.0020 | opp 0.1642 (margin 0.013, anchors 4.2) | lr 2.68e-09
+step   5000 | loss 0.7854 | mse 0.0008 | kl 27.920345 | act 0.5883 | zero 0.0015 | opp 0.1445 (margin 0.023, anchors 3.8) | lr 0.00e+00
+[val] step   5000 | loss 0.0981 | mse 0.0006 | psnr 32.49 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0005000
+Training complete.

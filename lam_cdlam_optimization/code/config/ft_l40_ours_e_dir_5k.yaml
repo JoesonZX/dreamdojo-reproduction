@@ -1,0 +1,65 @@
+# Ours-A: KL fine-tune trunk + zero-transition calibration.
+# Goal: reduce static-pair response while preserving KL baseline action R2.
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 40
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 3.0e-3
+  beta_env: 1.0e-6
+  env_dim: 8
+  action_dim: 18
+  action_head: true
+  lambda_action: 1.0
+  lambda_indep: 0.0
+  lambda_zero: 0.1
+  zero_margin: 0.05
+  # ── L_dir (真实反平行臂) ──
+  # 配对规则见 notes/dir_pair_audit.md:同 episode ∧ Δt∈[0.5,2]s ∧ 幅度>p80 ∧ cos<-0.5
+  # (ego-motion 补偿)。⚠ 当前 pair 源是 GT 位姿(oracle),仅用于机制验证;
+  # 论文主线需换成光流/关键点自监督代理。
+  lambda_dir: 0.1
+  dir_pairs_path: /home/xuan/embodied-ai/lam_cdlam_optimization/data/dir_pairs_train.npz
+  dir_pair_kind: 0
+  dir_pairs_per_step: 2      # x2 clips per micro-batch; with accum=4 -> 8 pairs per optimizer step (main batch is only 4, so 8 clips OOMed a 48G card)
+  dir_target_cos: -0.2
+  dir_warmup: 500
+  dir_weight_by_cos: false
+  init_from: /home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt
+  freeze_encoder: false
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_e_dir_5k/log_imgs
+
+data:
+  dataset_type: egodex
+  data_root: /home/xuan/embodied-ai/data/egodex/test_240p
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+  load_actions: true
+
+training:
+  per_gpu_batch_size: 4
+  gradient_accumulation_steps: 4
+  num_workers: 10
+  pin_memory: true
+  total_steps: 5000
+  lr: 1.0e-5
+  weight_decay: 0.01
+  warmup_steps: 200
+  mixed_precision: bf16
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_e_dir_5k
+  save_every: 1000
+  eval_every: 500
+  log_every: 50
+  keep_last_n: 1
+
+logging:
+  project: dreamdojo-lam-disentangle
+  run_name: ft-l40-ours-e-dir-5k
+  use_wandb: false

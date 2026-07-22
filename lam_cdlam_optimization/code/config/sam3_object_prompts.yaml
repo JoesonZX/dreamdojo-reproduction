@@ -1,0 +1,126 @@
+# Per-task SAM3 object prompts for EgoDex.
+#
+# SAM3 text grounding needs a CONCRETE category noun on this 240p footage --
+# relational phrases ("objects being manipulated") and the bare word "object"
+# ground nothing, while "cup" hits 100% (verified A/B, 2026-07-20). So each task
+# gets the noun for its manipulated object, mostly read straight from the task
+# name. The noun grounds EVERY instance of that class in frame; the contact
+# channel (dilated hand & object) is what isolates the one actually in hand.
+#
+# `default` is used for any task not listed. Entries marked  # CHECK  are best
+# guesses for task names that do not name their object -- the 1-video validation
+# run flags whichever fail (high o_empty) so only those need a look.
+
+default: object
+
+add_remove_lid: cup
+arrange_topple_dominoes: domino
+assemble_disassemble_furniture_bench_chair: white block   # miniature foam kit, not a real chair
+assemble_disassemble_furniture_bench_desk: white block
+assemble_disassemble_furniture_bench_drawer: white block
+assemble_disassemble_furniture_bench_lamp: white block
+assemble_disassemble_furniture_bench_square_table: white block
+assemble_disassemble_furniture_bench_stool: white block
+assemble_disassemble_legos: lego
+assemble_disassemble_soft_legos: foam block          # CHECK
+assemble_disassemble_structures: block               # CHECK
+assemble_disassemble_tiles: tile
+assemble_jenga: wooden block
+basic_fold: cloth
+basic_pick_place: object                             # CHECK
+boil_serve_egg: frying pan                           # verified 3/3 (toy stove)
+braid_unbraid: string                                # CHECK (thin cords)
+build_unstack_lego: lego
+charge_uncharge_airpods: airpods case
+charge_uncharge_device: phone                        # CHECK
+clean_cups: cup
+clean_surface: cloth                                 # CHECK
+clean_tableware: plate                               # CHECK
+clip_unclip_papers: paper
+color: book                                          # verified 3/3 (coloring book)
+crumple_flatten_paper: paper
+deal_gather_cards: playing card
+declutter_desk: object                               # CHECK
+dry_hands: towel
+fidget_magnetic_spinner_rings: ring
+flip_coin: coin
+flip_pages: book
+fold_stack_unstack_unfold_cloths: cloth
+fold_unfold_paper_basic: paper
+fold_unfold_paper_origami: paper
+fry_bread: bread
+fry_egg: egg
+gather_roll_dice: dice
+insert_dump_blocks: block
+insert_remove_airpods: airpods
+insert_remove_bagging: bag                           # CHECK
+insert_remove_bookshelf: book
+insert_remove_cups_from_rack: cup
+insert_remove_drawer: drawer
+insert_remove_furniture_bench_cabinet: white block   # partial 1/3 (foam model)
+insert_remove_furniture_bench_round_table: table
+insert_remove_plug_socket: power strip               # partial 2/3
+insert_remove_shirt_in_tube: cloth                   # verified 3/3
+insert_remove_tennis_ball: tennis ball
+insert_remove_usb: usb drive
+insert_remove_utensils: wire basket                  # verified 3/3
+knead_slime: slime                                   # CHECK
+load_dispense_ice: ice                               # CHECK (scoop?)
+lock_unlock_key: key
+make_sandwich: bread                                 # CHECK
+measure_objects: ruler                               # CHECK
+open_close_insert_remove_box: box
+open_close_insert_remove_case: case
+open_close_insert_remove_tupperware: plastic container   # verified 2/3 ('tupperware' grounds nothing)
+paint_clean_brush: paintbrush
+peel_place_sticker: sticker
+pick_place_food: food                                # CHECK
+pick_up_and_put_down_case_or_bag: bag                # CHECK (case?)
+play_mancala: bead                                   # CHECK
+play_piano: piano                                    # CHECK (hands-dominant)
+play_reset_connect_four: game board                  # verified 3/3
+point_and_click_remote: remote
+pour: bottle                                         # CHECK (cup?)
+push_pop_toy: toy
+put_away_set_up_board_game: game piece               # CHECK
+put_in_take_out_glasses: glasses
+put_toothpaste_on_toothbrush: toothbrush
+rake_smooth_zen_garden: rake
+roll_ball: ball
+scoop_dump_ice: scoop                                # verified 2/3
+screw_unscrew_allen_fixture: screw                   # CHECK
+screw_unscrew_bottle_cap: bottle
+screw_unscrew_fingers_fixture: screw                 # CHECK
+set_up_clean_up_chessboard: chess piece
+setup_cleanup_table: cup                             # tentative (red mat + colorful cups)
+sleeve_unsleeve_cards: playing card
+slot_batteries: battery
+sort_beads: bead
+stack: block                                         # CHECK
+stack_remove_jenga: wooden block
+stack_unstack_bowls: bowl
+stack_unstack_cups: cup
+stack_unstack_plates: plate
+stack_unstack_tupperware: plastic container
+staple_paper: paper
+stock_unstock_fridge: bottle                         # CHECK
+sweep_dustpan: dustpan
+thread_unthread_bead_necklace: bead
+throw_and_catch_ball: ball
+throw_collect_objects: ball                           # CHECK
+tie_and_untie_shoelace: shoe
+tie_untie_rubberband: rubber band
+type_keyboard: keyboard
+use_chopsticks: chopsticks
+use_rubiks_cube: rubiks cube
+vertical_pick_place: plastic bin                     # verified 2/3, 153-video task
+wash_fruit: fruit
+wash_kitchen_dishes: plate                           # CHECK
+wash_put_away_dishes: plate
+wipe_kitchen_surfaces: sponge                        # CHECK
+wipe_screen: cloth                                   # CHECK
+wrap: paper                                          # CHECK
+wrap_unwrap_food: plastic wrap                       # verified 2/3
+write: pen
+zip_unzip_bag: bag
+zip_unzip_case: case

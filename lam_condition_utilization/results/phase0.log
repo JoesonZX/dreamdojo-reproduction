@@ -1,0 +1,54 @@
+pool N=1500  anchors=840  video shape=(1500, 2, 240, 320, 3)
+
+=== donor 方案排序统计(18D 动作)===
+  verb         n= 840  frac(ds<do)=0.488 cos_same=+0.18 cos_opp=+0.20 mag_o/i=1.00
+  dist         n= 840  frac(ds<do)=1.000 cos_same=+0.57 cos_opp=-0.03 mag_o/i=2.29
+  random       n= 840  frac(ds<do)=0.550 cos_same=+0.21 cos_opp=+0.19 mag_o/i=1.01
+  antiparallel n= 840  frac(ds<do)=1.000 cos_same=+0.92 cos_opp=-0.55 mag_o/i=0.97
+
+=== frame-delta ORACLE(参考上限)C_pooled ===
+  oracle × verb          C_pooled=+0.0345
+  oracle × dist          C_pooled=+1.1487
+  oracle × random        C_pooled=+0.0645
+  oracle × antiparallel  C_pooled=+0.0578
+
+======================================================================
+SEED 42:  A0=sb_A0  A1=sb_A1
+======================================================================
+
+--- 0.1 paired-latent audit (A0 vs A1) ---
+  ‖Δμ‖ rel=0.016  cosine=1.000  per-dim r(action)=1.000
+  CKA=1.000  Procrustes-R²=1.000  kNN-overlap@10=0.967
+  readout R²:  self A0=0.243  cross A0→A1=0.243  |  self A1=0.242  cross A1→A0=0.241
+
+--- 0.2 four-cell cross-decoding (rows=decoder, cols=encoder μ) ---
+  D_A0×E_A0:  dist C=+0.8301  antipar C=+0.3807  random C=+0.0694  |  R_out(dist)=0.0479  PSNR=36.06
+  D_A0×E_A1:  dist C=+0.8238  antipar C=+0.3794  random C=+0.0673  |  R_out(dist)=0.0478  PSNR=35.87
+  D_A1×E_A0:  dist C=+0.0387  antipar C=+0.0643  random C=+0.0141  |  R_out(dist)=0.0249  PSNR=32.73
+  D_A1×E_A1:  dist C=+0.0390  antipar C=+0.0643  random C=+0.0140  |  R_out(dist)=0.0249  PSNR=32.73
+
+  [dist C matrix]      E_A0     E_A1
+    D_A0            +0.8301  +0.8238
+    D_A1            +0.0387  +0.0390
+
+======================================================================
+SEED 1:  A0=sb_A0_s1  A1=sb_A1_s1
+======================================================================
+
+--- 0.1 paired-latent audit (A0 vs A1) ---
+  ‖Δμ‖ rel=0.048  cosine=0.999  per-dim r(action)=0.999
+  CKA=0.999  Procrustes-R²=0.998  kNN-overlap@10=0.889
+  readout R²:  self A0=0.230  cross A0→A1=0.234  |  self A1=0.232  cross A1→A0=0.227
+
+--- 0.2 four-cell cross-decoding (rows=decoder, cols=encoder μ) ---
+  D_A0×E_A0:  dist C=+0.8251  antipar C=+0.3858  random C=+0.0333  |  R_out(dist)=0.0481  PSNR=36.18
+  D_A0×E_A1:  dist C=+0.8165  antipar C=+0.3896  random C=+0.0327  |  R_out(dist)=0.0479  PSNR=36.05
+  D_A1×E_A0:  dist C=+0.0777  antipar C=+0.0728  random C=+0.0146  |  R_out(dist)=0.0253  PSNR=32.88
+  D_A1×E_A1:  dist C=+0.0780  antipar C=+0.0728  random C=+0.0149  |  R_out(dist)=0.0253  PSNR=32.88
+
+  [dist C matrix]      E_A0     E_A1
+    D_A0            +0.8251  +0.8165
+    D_A1            +0.0777  +0.0780
+
+wrote results/stage_b_phase0_paired_latent.json
+wrote results/stage_b_phase0_cross_decode.json

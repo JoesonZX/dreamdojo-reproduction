@@ -1,0 +1,14 @@
+[device] cuda:0
+[load_model] dropping 2 training-side keys: ['pctr_bias', 'pctr_logit_scale']
+[cdlam_repro_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_cdlam_repro_5k/step_0005000
+[cdlam_repro_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 1 run(s) -> results/lam_benchmark_stage0_part2/summary.md
+[skip] ours_d_r2_fg_5k: checkpoint not found at /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_d_r2_fg_5k/step_0005000
+[ours_r2_opp_l01_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k/step_0005000
+[ours_r2_opp_l01_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 2 run(s) -> results/lam_benchmark_stage0_part2/summary.md
+[ours_r2_opp_l01_5k_lf] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k_lf/step_0005000
+[ours_r2_opp_l01_5k_lf] val_size=80,509 latent_dim=40 action_part=32
+[progress] 3 run(s) -> results/lam_benchmark_stage0_part2/summary.md
+[skip] idm_5k: checkpoint not found at /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_idm_5k/step_0005000
+[done] wrote results/lam_benchmark_stage0_part2/summary.md and per-dim CSVs

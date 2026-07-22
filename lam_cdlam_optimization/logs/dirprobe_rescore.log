@@ -1,0 +1,36 @@
+[init_from] LAM_400k.ckpt: loaded 839/843 tensors
+[init_from] left random-init (4): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight
+[raw_lam] source=/home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt action_part=32
+  gain=-0.3146 null=-0.3919 vs_null=+0.0774 p=0.05 auc 0.554->0.563 | old_gap=-0.105 -> DIRECTION-INFO
+[init_from] CDLAM_official_lam.pt: loaded 839/839 tensors
+[cdlam_official] source=/home/xuan/embodied-ai/checkpoints/pretrained/CDLAM_official_lam.pt action_part=32
+  gain=-0.3028 null=-0.3838 vs_null=+0.0811 p=0.00 auc 0.568->0.569 | old_gap=-0.095 -> DIRECTION-INFO
+[load_model] dropping 2 training-side keys: ['pctr_bias', 'pctr_logit_scale']
+[cdlam_repro_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_cdlam_repro_5k/step_0005000 action_part=32
+  gain=-0.1596 null=-0.2142 vs_null=+0.0546 p=0.10 auc 0.591->0.590 | old_gap=-0.168 -> no-info
+[kl_ft_l40_full_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k/step_0005000 action_part=32
+  gain=-0.1947 null=-0.2448 vs_null=+0.0501 p=0.05 auc 0.571->0.573 | old_gap=-0.128 -> DIRECTION-INFO
+[ours_a_zero_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k/step_0005000 action_part=32
+  gain=-0.1788 null=-0.2160 vs_null=+0.0372 p=0.20 auc 0.577->0.580 | old_gap=-0.143 -> no-info
+[ours_r2_opp_l01_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k/step_0005000 action_part=32
+  gain=-0.1399 null=-0.2375 vs_null=+0.0976 p=0.00 auc 0.585->0.592 | old_gap=-0.141 -> DIRECTION-INFO
+[kl_ft_l40_full_5k_lf] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k_lf/step_0005000 action_part=32
+  gain=-0.0869 null=-0.1324 vs_null=+0.0454 p=0.05 auc 0.563->0.565 | old_gap=-0.065 -> DIRECTION-INFO
+[ours_r2_opp_l01_5k_lf] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k_lf/step_0005000 action_part=32
+  gain=-0.0567 null=-0.1202 vs_null=+0.0635 p=0.05 auc 0.617->0.633 | old_gap=-0.080 -> DIRECTION-INFO
+[idm_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_idm_5k/step_0005000 action_part=32
+  gain=-0.1419 null=-0.2393 vs_null=+0.0974 p=0.00 auc 0.571->0.581 | old_gap=-0.143 -> DIRECTION-INFO
+[kl_ft_l40_full_5k_s1] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k_s1/step_0005000 action_part=32
+  gain=-0.1803 null=-0.2306 vs_null=+0.0503 p=0.05 auc 0.579->0.577 | old_gap=-0.120 -> DIRECTION-INFO
+[kl_ft_l40_full_5k_s2] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k_s2/step_0005000 action_part=32
+  gain=-0.1638 null=-0.2409 vs_null=+0.0771 p=0.00 auc 0.578->0.584 | old_gap=-0.131 -> DIRECTION-INFO
+[ours_a_zero_5k_s1] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k_s1/step_0005000 action_part=32
+  gain=-0.1581 null=-0.2141 vs_null=+0.0560 p=0.00 auc 0.573->0.577 | old_gap=-0.149 -> DIRECTION-INFO
+[ours_a_zero_5k_s2] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k_s2/step_0005000 action_part=32
+  gain=-0.1841 null=-0.2158 vs_null=+0.0317 p=0.20 auc 0.588->0.585 | old_gap=-0.120 -> no-info
+[ours_r2_opp_l01_5k_s1] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k_s1/step_0005000 action_part=32
+  gain=-0.1893 null=-0.2413 vs_null=+0.0520 p=0.00 auc 0.623->0.615 | old_gap=-0.144 -> DIRECTION-INFO
+[ours_r2_opp_l01_5k_s2] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k_s2/step_0005000 action_part=32
+  gain=-0.1580 null=-0.2175 vs_null=+0.0595 p=0.05 auc 0.583->0.580 | old_gap=-0.107 -> DIRECTION-INFO
+
+wrote results/dirprobe_rescore.csv (15 runs)

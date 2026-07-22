@@ -1,0 +1,38 @@
+[device] cuda:0
+[kl_ft_l40_full_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k/step_0005000
+[kl_ft_l40_full_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_a_zero_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k/step_0005000
+[ours_a_zero_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_b2_zero_action_reverse_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_b2_zero_action_reverse_5k/step_0005000
+[ours_b2_zero_action_reverse_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_c_zero_reverse_hardneg_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_c_zero_reverse_hardneg_5k/step_0005000
+[ours_c_zero_reverse_hardneg_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_r_zero_opposite_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r_zero_opposite_5k/step_0005000
+[ours_r_zero_opposite_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_r2_opp_l01_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k/step_0005000
+[ours_r2_opp_l01_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_r2_opp_l03_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l03_5k/step_0005000
+[ours_r2_opp_l03_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_r2_opp_l05_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l05_5k/step_0005000
+[ours_r2_opp_l05_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[ours_r2_opp_l08_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l08_5k/step_0005000
+[ours_r2_opp_l08_5k] val_size=80,509 latent_dim=40 action_part=32
+/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py:724: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  res["labeleff_auc"] = float(np.trapz(r2s, lf) / (lf[-1] - lf[0]))
+[done] wrote results/lam_benchmark_r2_standard/summary.md and per-dim CSVs

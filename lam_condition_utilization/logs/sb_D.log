@@ -1,0 +1,43 @@
+The following values were not passed to `accelerate launch` and had defaults used instead:
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+/home/xuan/.venv/lib/python3.10/site-packages/accelerate/utils/launch.py:236: UserWarning: Port `29500` is already in use. Accelerate will attempt to launch in a standalone-like mode by finding an open port automatically for this session. If this current attempt fails, or for more control in future runs, please specify a different port (e.g., `--main_process_port <your_chosen_port>`) or use `--main_process_port 0` for automatic selection in your launch command or Accelerate config file.
+  warnings.warn(
+latent_dim=40 action_part=32 env_dim=8 | action_head=True (lambda_action=1.0) | indep=False (lambda_indep=0.0) | split_kl=True (beta_a=0.003, beta_e=1e-06) | contrastive=False (supcon=0.0, temporal=0.0, tau=0.1) | causal(zero=0.1, reverse=0.0, hardneg=0.0, opposite=0.0, pctr=0.0) | recon=1.0 | use=0.0 | dir=0.1 (kind=ANTI, n=2, target=-0.2)
+Model params: 709.8M
+[init_from] LAM_400k.ckpt: loaded 836/843 tensors
+[init_from] shape-mismatch skipped (3): fc.weight(64, 1024)->(80, 1024), fc.bias(64,)->(80,), action_up.weight(1024, 32)->(1024, 40)
+[init_from] left random-init (7): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight, action_up.weight, fc.bias, fc.weight
+[manifest] excluding frozen eval episodes: /home/xuan/embodied-ai/lam_disentangle/data/eval_manifest.json
+Train pairs: 624,133  Val pairs: 80,509
+[dir] 236,784 pairs (kind=anti-parallel) from /home/xuan/embodied-ai/lam_disentangle/data/dir_pairs_train.npz
+[lr] warmup=200 total=1000 num_processes=2 (schedule expressed in global steps)
+Starting training from step 0 -> 1000
+step     50 | loss 0.8524 | mse 0.0059 | kl 3.583335 | act 0.8029 | zero 0.3304 | dir 0.4359 (za_cos +0.230, act 0.94) | lr 2.50e-06
+step    100 | loss 0.8369 | mse 0.0020 | kl 2.276816 | act 0.8246 | zero 0.0143 | dir 0.2382 (za_cos -0.010, act 0.68) | lr 5.00e-06
+step    150 | loss 0.8992 | mse 0.0010 | kl 2.276723 | act 0.8870 | zero 0.0112 | dir 0.1835 (za_cos -0.120, act 0.56) | lr 7.50e-06
+step    200 | loss 0.9091 | mse 0.0009 | kl 5.284854 | act 0.8862 | zero 0.0166 | dir 0.1769 (za_cos -0.193, act 0.46) | lr 1.00e-05
+step    250 | loss 0.9477 | mse 0.0010 | kl 7.921837 | act 0.9140 | zero 0.0310 | dir 0.1695 (za_cos -0.225, act 0.40) | lr 9.90e-06
+step    300 | loss 1.1724 | mse 0.0011 | kl 13.143431 | act 1.1247 | zero 0.0275 | dir 0.1288 (za_cos -0.266, act 0.31) | lr 9.62e-06
+step    350 | loss 1.2670 | mse 0.0011 | kl 12.743760 | act 1.2151 | zero 0.0265 | dir 0.1915 (za_cos -0.173, act 0.41) | lr 9.16e-06
+step    400 | loss 0.9348 | mse 0.0009 | kl 14.740396 | act 0.8838 | zero 0.0133 | dir 0.0978 (za_cos -0.314, act 0.27) | lr 8.54e-06
+step    450 | loss 0.9444 | mse 0.0011 | kl 14.478724 | act 0.8928 | zero 0.0124 | dir 0.0988 (za_cos -0.320, act 0.29) | lr 7.78e-06
+step    500 | loss 1.2748 | mse 0.0009 | kl 14.675234 | act 1.2179 | zero 0.0110 | dir 0.1406 (za_cos -0.251, act 0.30) | lr 6.91e-06
+[val] step    500 | loss 0.0392 | mse 0.0010 | psnr 29.87 dB
+step    550 | loss 1.0465 | mse 0.0008 | kl 14.418417 | act 0.9918 | zero 0.0143 | dir 0.1142 (za_cos -0.284, act 0.32) | lr 5.98e-06
+step    600 | loss 0.8343 | mse 0.0008 | kl 16.768245 | act 0.7702 | zero 0.0080 | dir 0.1459 (za_cos -0.264, act 0.30) | lr 5.00e-06
+step    650 | loss 0.7529 | mse 0.0008 | kl 16.033876 | act 0.6958 | zero 0.0091 | dir 0.0948 (za_cos -0.312, act 0.30) | lr 4.02e-06
+step    700 | loss 0.9379 | mse 0.0009 | kl 23.244433 | act 0.8581 | zero 0.0059 | dir 0.1146 (za_cos -0.296, act 0.31) | lr 3.09e-06
+step    750 | loss 0.7486 | mse 0.0009 | kl 21.601228 | act 0.6759 | zero 0.0055 | dir 0.0915 (za_cos -0.328, act 0.30) | lr 2.22e-06
+step    800 | loss 0.6194 | mse 0.0007 | kl 13.227313 | act 0.5727 | zero 0.0027 | dir 0.0805 (za_cos -0.330, act 0.29) | lr 1.46e-06
+step    850 | loss 0.9824 | mse 0.0008 | kl 16.354318 | act 0.9278 | zero 0.0010 | dir 0.0688 (za_cos -0.349, act 0.26) | lr 8.43e-07
+step    900 | loss 0.7508 | mse 0.0007 | kl 14.684283 | act 0.6997 | zero 0.0027 | dir 0.0798 (za_cos -0.335, act 0.28) | lr 3.81e-07
+step    950 | loss 1.1282 | mse 0.0008 | kl 18.143611 | act 1.0691 | zero 0.0015 | dir 0.0607 (za_cos -0.361, act 0.26) | lr 9.61e-08
+step   1000 | loss 0.8866 | mse 0.0008 | kl 19.015059 | act 0.8196 | zero 0.0003 | dir 0.1136 (za_cos -0.296, act 0.34) | lr 0.00e+00
+[val] step   1000 | loss 0.0508 | mse 0.0010 | psnr 29.99 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_sb_D/step_0001000
+Training complete.
+[rank0]:[W720 09:37:29.453317790 ProcessGroupNCCL.cpp:1553] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

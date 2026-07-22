@@ -1,0 +1,16 @@
+# Pinned to the versions verified working on the source machine
+# (python 3.10.12, CUDA 12.8, RTX 6000 Ada). Install torch FIRST from the cu128
+# index, then the rest -- see scripts/setup_env.sh.
+torch==2.10.0
+torchvision==0.25.0
+accelerate==1.13.0
+numpy==2.2.6
+opencv-python-headless==4.13.0.92
+decord==0.6.0
+einops==0.8.2
+safetensors==0.7.0
+PyYAML==6.0.3
+h5py==3.16.0
+pillow==12.2.0
+# Ego-Exo4D download CLI (provides the `egoexo` command)
+ego4d

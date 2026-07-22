@@ -1,0 +1,25 @@
+[device] cuda:0
+[init_from] LAM_400k.ckpt: loaded 839/843 tensors
+[init_from] left random-init (4): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight
+[raw_lam] source=/home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt
+[raw_lam] val_size=80,509 latent_dim=32 action_part=32
+[progress] 1 run(s) -> results/lam_benchmark_stage0/summary.md
+[kl_ft_l40_full_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k/step_0005000
+[kl_ft_l40_full_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 2 run(s) -> results/lam_benchmark_stage0/summary.md
+[kl_ft_l40_full_5k_lf] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k_lf/step_0005000
+[kl_ft_l40_full_5k_lf] val_size=80,509 latent_dim=40 action_part=32
+[progress] 3 run(s) -> results/lam_benchmark_stage0/summary.md
+Traceback (most recent call last):
+  File "/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py", line 1751, in <module>
+    main()
+  File "/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py", line 1727, in main
+    run_one(
+  File "/home/xuan/embodied-ai/lam_disentangle/code/benchmark_lam.py", line 1389, in run_one
+    model = load_model(str(_resolve(spec.checkpoint)), cfg, device)
+  File "/home/xuan/embodied-ai/lam_disentangle/code/eval.py", line 76, in load_model
+    model.load_state_dict(state_dict, strict=True)
+  File "/home/xuan/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2635, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for LatentActionModel:
+	Unexpected key(s) in state_dict: "pctr_bias", "pctr_logit_scale". 

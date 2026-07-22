@@ -1,0 +1,6 @@
+notes/*.pdf
+archive/*.tar.gz
+**/__pycache__/
+*.pyc
+logs/sam3_hoc/
+logs/sam3_hoc_rerun/

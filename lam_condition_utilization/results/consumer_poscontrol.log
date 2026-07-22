@@ -1,0 +1,44 @@
+train clips=800  dev clips=100  K=8 skip=3 cond=gt_action
+cached train (800, 9, 240, 320, 3) dev (100, 9, 240, 320, 3)
+consumer params=8.6M
+step     1 L1w=0.0273 | h1 endpoint tgt=2.608 shuf=2.609 anti=2.607 zero=2.610 | h1 dir_cos tgt=+0.036 shuf=+0.003 anti=+0.021 | h8 dir_cos tgt=-0.076 anti=-0.012
+step   250 L1w=0.0678 | h1 endpoint tgt=2.604 shuf=2.607 anti=2.604 zero=2.603 | h1 dir_cos tgt=+0.032 shuf=+0.020 anti=+0.033 | h8 dir_cos tgt=+0.065 anti=+0.061
+step   500 L1w=0.0432 | h1 endpoint tgt=2.603 shuf=2.601 anti=2.603 zero=2.602 | h1 dir_cos tgt=+0.036 shuf=+0.041 anti=+0.004 | h8 dir_cos tgt=+0.148 anti=+0.124
+step   750 L1w=0.0336 | h1 endpoint tgt=2.599 shuf=2.600 anti=2.599 zero=2.601 | h1 dir_cos tgt=+0.067 shuf=+0.036 anti=+0.033 | h8 dir_cos tgt=+0.169 anti=+0.110
+step  1000 L1w=0.0334 | h1 endpoint tgt=2.596 shuf=2.598 anti=2.601 zero=2.596 | h1 dir_cos tgt=+0.156 shuf=+0.081 anti=+0.093 | h8 dir_cos tgt=+0.097 anti=+0.074
+step  1250 L1w=0.0266 | h1 endpoint tgt=2.592 shuf=2.623 anti=2.635 zero=2.593 | h1 dir_cos tgt=+0.105 shuf=+0.035 anti=+0.018 | h8 dir_cos tgt=+0.053 anti=+0.036
+step  1500 L1w=0.0280 | h1 endpoint tgt=2.613 shuf=2.643 anti=2.713 zero=2.607 | h1 dir_cos tgt=+0.125 shuf=+0.051 anti=+0.021 | h8 dir_cos tgt=+0.122 anti=+0.050
+step  1750 L1w=0.0236 | h1 endpoint tgt=2.667 shuf=2.711 anti=2.745 zero=2.661 | h1 dir_cos tgt=+0.164 shuf=+0.103 anti=+0.056 | h8 dir_cos tgt=+0.082 anti=+0.064
+step  2000 L1w=0.0427 | h1 endpoint tgt=2.681 shuf=2.707 anti=2.900 zero=2.623 | h1 dir_cos tgt=+0.176 shuf=+0.080 anti=+0.009 | h8 dir_cos tgt=+0.112 anti=+0.076
+step  2250 L1w=0.0225 | h1 endpoint tgt=2.645 shuf=2.756 anti=2.878 zero=2.597 | h1 dir_cos tgt=+0.192 shuf=+0.070 anti=+0.025 | h8 dir_cos tgt=+0.108 anti=+0.063
+step  2500 L1w=0.0244 | h1 endpoint tgt=2.627 shuf=2.805 anti=2.752 zero=2.606 | h1 dir_cos tgt=+0.228 shuf=+0.072 anti=+0.059 | h8 dir_cos tgt=+0.151 anti=+0.091
+step  2750 L1w=0.0264 | h1 endpoint tgt=2.704 shuf=2.815 anti=2.766 zero=2.667 | h1 dir_cos tgt=+0.180 shuf=+0.086 anti=+0.060 | h8 dir_cos tgt=+0.084 anti=+0.053
+step  3000 L1w=0.0320 | h1 endpoint tgt=2.683 shuf=2.769 anti=2.854 zero=2.598 | h1 dir_cos tgt=+0.192 shuf=+0.077 anti=+0.061 | h8 dir_cos tgt=+0.164 anti=+0.064
+step  3250 L1w=0.0298 | h1 endpoint tgt=2.677 shuf=2.849 anti=2.890 zero=2.627 | h1 dir_cos tgt=+0.224 shuf=+0.087 anti=+0.074 | h8 dir_cos tgt=+0.096 anti=+0.021
+step  3500 L1w=0.0311 | h1 endpoint tgt=2.637 shuf=2.844 anti=2.764 zero=2.587 | h1 dir_cos tgt=+0.192 shuf=+0.119 anti=+0.072 | h8 dir_cos tgt=+0.074 anti=+0.010
+step  3750 L1w=0.0307 | h1 endpoint tgt=2.779 shuf=2.985 anti=2.875 zero=2.624 | h1 dir_cos tgt=+0.162 shuf=+0.067 anti=+0.029 | h8 dir_cos tgt=+0.129 anti=+0.070
+step  4000 L1w=0.0238 | h1 endpoint tgt=2.632 shuf=2.919 anti=2.930 zero=2.599 | h1 dir_cos tgt=+0.179 shuf=+0.095 anti=-0.005 | h8 dir_cos tgt=+0.091 anti=+0.014
+step  4250 L1w=0.0318 | h1 endpoint tgt=2.712 shuf=3.051 anti=2.975 zero=2.622 | h1 dir_cos tgt=+0.225 shuf=+0.075 anti=+0.038 | h8 dir_cos tgt=+0.153 anti=+0.047
+step  4500 L1w=0.0272 | h1 endpoint tgt=2.689 shuf=2.882 anti=2.936 zero=2.593 | h1 dir_cos tgt=+0.235 shuf=+0.103 anti=+0.014 | h8 dir_cos tgt=+0.137 anti=+0.038
+step  4750 L1w=0.0283 | h1 endpoint tgt=2.634 shuf=2.913 anti=2.850 zero=2.603 | h1 dir_cos tgt=+0.231 shuf=+0.122 anti=+0.046 | h8 dir_cos tgt=+0.102 anti=+0.006
+step  5000 L1w=0.0227 | h1 endpoint tgt=2.779 shuf=3.061 anti=2.947 zero=2.677 | h1 dir_cos tgt=+0.219 shuf=+0.109 anti=+0.078 | h8 dir_cos tgt=+0.130 anti=+0.015
+step  5250 L1w=0.0170 | h1 endpoint tgt=2.725 shuf=3.064 anti=3.154 zero=2.598 | h1 dir_cos tgt=+0.237 shuf=+0.104 anti=-0.003 | h8 dir_cos tgt=+0.128 anti=+0.036
+step  5500 L1w=0.0164 | h1 endpoint tgt=2.678 shuf=2.849 anti=3.010 zero=2.601 | h1 dir_cos tgt=+0.256 shuf=+0.119 anti=+0.015 | h8 dir_cos tgt=+0.147 anti=+0.058
+step  5750 L1w=0.0236 | h1 endpoint tgt=2.638 shuf=2.977 anti=2.971 zero=2.599 | h1 dir_cos tgt=+0.261 shuf=+0.107 anti=+0.030 | h8 dir_cos tgt=+0.157 anti=+0.086
+step  6000 L1w=0.0284 | h1 endpoint tgt=2.709 shuf=2.970 anti=3.126 zero=2.604 | h1 dir_cos tgt=+0.239 shuf=+0.119 anti=-0.021 | h8 dir_cos tgt=+0.155 anti=+0.069
+step  6250 L1w=0.0295 | h1 endpoint tgt=2.692 shuf=2.922 anti=3.226 zero=2.597 | h1 dir_cos tgt=+0.234 shuf=+0.116 anti=-0.021 | h8 dir_cos tgt=+0.160 anti=+0.038
+step  6500 L1w=0.0235 | h1 endpoint tgt=2.738 shuf=3.055 anti=3.344 zero=2.598 | h1 dir_cos tgt=+0.255 shuf=+0.086 anti=-0.029 | h8 dir_cos tgt=+0.168 anti=+0.096
+step  6750 L1w=0.0160 | h1 endpoint tgt=2.800 shuf=2.919 anti=3.173 zero=2.656 | h1 dir_cos tgt=+0.231 shuf=+0.101 anti=-0.048 | h8 dir_cos tgt=+0.158 anti=+0.091
+step  7000 L1w=0.0258 | h1 endpoint tgt=2.669 shuf=2.977 anti=3.255 zero=2.600 | h1 dir_cos tgt=+0.257 shuf=+0.135 anti=-0.053 | h8 dir_cos tgt=+0.135 anti=+0.062
+step  7250 L1w=0.0309 | h1 endpoint tgt=2.698 shuf=3.104 anti=3.319 zero=2.619 | h1 dir_cos tgt=+0.262 shuf=+0.103 anti=-0.063 | h8 dir_cos tgt=+0.178 anti=+0.081
+step  7500 L1w=0.0183 | h1 endpoint tgt=2.596 shuf=2.953 anti=3.336 zero=2.596 | h1 dir_cos tgt=+0.295 shuf=+0.131 anti=-0.034 | h8 dir_cos tgt=+0.131 anti=+0.027
+step  7750 L1w=0.0193 | h1 endpoint tgt=2.620 shuf=2.966 anti=3.334 zero=2.582 | h1 dir_cos tgt=+0.245 shuf=+0.118 anti=-0.044 | h8 dir_cos tgt=+0.177 anti=+0.073
+step  8000 L1w=0.0188 | h1 endpoint tgt=2.695 shuf=2.944 anti=3.196 zero=2.591 | h1 dir_cos tgt=+0.260 shuf=+0.098 anti=-0.043 | h8 dir_cos tgt=+0.128 anti=+0.028
+
+GATE (gt_action):  [horizons [1, 4, 8]]
+  target       h1: ep=2.695 dc=+0.260  h4: ep=6.016 dc=+0.132  h8: ep=6.644 dc=+0.128
+  shuffle      h1: ep=2.944 dc=+0.098  h4: ep=6.065 dc=+0.067  h8: ep=6.987 dc=+0.059
+  antiparallel h1: ep=3.196 dc=-0.043  h4: ep=5.986 dc=-0.009  h8: ep=6.775 dc=+0.028
+  zero         h1: ep=2.591 dc=+0.143  h4: ep=5.250 dc=+0.115  h8: ep=5.888 dc=+0.083
+  => positive-control gate PASS @h1: dir_cos target +0.260 vs shuffle +0.098 vs antiparallel -0.043; endpoint target 2.695 vs antiparallel 3.196
+wrote results/consumer_gt_action_s0.json + results/consumer_gt_action_s0.pt

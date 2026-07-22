@@ -1,0 +1,9 @@
+[device] cuda:0
+[init_from] CDLAM_official_lam.pt: loaded 839/839 tensors
+[cdlam_official] source=/home/xuan/embodied-ai/checkpoints/pretrained/CDLAM_official_lam.pt
+[cdlam_official] val_size=80,509 latent_dim=32 action_part=32
+[progress] 1 run(s) -> results/lam_benchmark_anchor/summary.md
+[init_from] LAM_400k.ckpt: loaded 839/843 tensors
+[init_from] left random-init (4): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight
+[raw_lam] source=/home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt
+[raw_lam] val_size=80,509 latent_dim=32 action_part=32

@@ -1,0 +1,69 @@
+# CD-LAM 官方 checkpoint —— benchmark 的外部锚点(EXTERNAL ANCHOR,不训练)
+#
+# 来源: https://huggingface.co/yufanwei/CD-LAM  ->  models/lam/model.pt (2.84 GB)
+#   本地: checkpoints/pretrained/CDLAM_official_lam.pt
+#   License: nvidia-open-model-license (继承自 DreamDojo/Cosmos)
+#   论文: notes/Causal_Debiased_LAM (18).pdf;对照见 notes/cdlam_repro_fidelity.md
+#
+# 为什么要这一行(而不是只有我们的 cdlam_repro):
+#   1. 直接测官方模型的 opp_cls_direction_gain —— 若也为负,"方向未编码"就有了
+#      官方 checkpoint 级证据,强于我们的受控 repro;
+#   2. 校准 repro 忠实度: 其 static_response_rel_median 应落在论文的 0.043 附近
+#      (= 项目页标的 id_ratio);
+#   3. 它没有消费 18D 动作监督 ⇒ mlp_action_r2 对它是完全外部的公平指标
+#      (我们带 lambda_action=1.0 的家族没有这个资格)。
+#
+# ⚠ 架构差异: latent 32 维、无 action/env split(env_dim=0) ⇒
+#   action_part = latent_dim,所有 _ze 子空间指标为 nan,_za == full。
+#   与 raw_lam 行(同样 latent 32)的处理方式一致,读表时按 full-latent 口径。
+# ⚠ action_head: false —— 他们 Stage-1 是 action-free 的。benchmark 从不读模型自带
+#   的 action head(probe 是外部另训的 MLP),所以设 false 只是如实声明,不影响任何指标。
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 32
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 1.0e-6
+  env_dim: 0
+  action_dim: 18
+  action_head: false
+  init_from: /home/xuan/embodied-ai/checkpoints/pretrained/CDLAM_official_lam.pt
+  freeze_encoder: true
+
+# 必须与全部其他 run 逐字一致 —— val split 由 (data_root, val_ratio, seed) 决定,
+# 任何改动都会让这一行与其他行评的不是同一批样本。
+data:
+  dataset_type: egodex
+  data_root: /home/xuan/embodied-ai/data/egodex/test_240p
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+  load_actions: true
+
+# 仅供 benchmark 构造 dataloader 用;本行永不训练。
+training:
+  per_gpu_batch_size: 16
+  gradient_accumulation_steps: 1
+  num_workers: 10
+  pin_memory: true
+  total_steps: 0
+  lr: 0.0
+  weight_decay: 0.0
+  warmup_steps: 0
+  mixed_precision: bf16
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-dis/_cdlam_official_never_trained
+  save_every: 1000000
+  eval_every: 1000000
+  log_every: 1000000
+  keep_last_n: 1
+
+logging:
+  project: dreamdojo-lam-disentangle
+  run_name: cdlam-official-anchor
+  use_wandb: false

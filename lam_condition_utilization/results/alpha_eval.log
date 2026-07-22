@@ -1,0 +1,47 @@
+pool N=1500  anchors=840
+
+=== donor 方案排序统计(18D 动作距离) ===
+  verb    n= 840  d_same=2.371 d_opp=2.350  frac(d_same<d_opp)=0.488
+  dist    n= 840  d_same=1.178 d_opp=4.201  frac(d_same<d_opp)=1.000
+  random  n= 840  d_same=2.309 d_opp=2.468  frac(d_same<d_opp)=0.550
+
+=== frame-delta ORACLE(已知强可控,无模型)C_pooled ===
+  oracle × verb     C_pooled=+0.0345  (median +0.0234)
+  oracle × dist     C_pooled=+1.1487  (median +0.9845)
+  oracle × random   C_pooled=+0.0645  (median +0.0435)
+
+=== LAM sb_A0(ft_l40_sb_A0)C_pooled ===
+  sb_A0 × verb     C_pooled=-0.0314  (median -0.0101, raw -1.68e-05)
+  sb_A0 × dist     C_pooled=+0.8301  (median +0.7001, raw +4.44e-04)
+  sb_A0 × random   C_pooled=+0.0694  (median +0.0345, raw +3.71e-05)
+
+=== LAM sb_A1(ft_l40_sb_A1)C_pooled ===
+  sb_A1 × verb     C_pooled=+0.0056  (median -0.0018, raw +2.98e-06)
+  sb_A1 × dist     C_pooled=+0.0390  (median -0.0675, raw +2.09e-05)
+  sb_A1 × random   C_pooled=+0.0140  (median +0.0093, raw +7.48e-06)
+
+=== 判读(C_pooled)===
+  ✅ scorer 灵敏:oracle×dist=+1.1487 ≫0, oracle×random=+0.0645≈0, oracle×verb=+0.0345
+     sb_A0×dist C_pooled=+0.8301  → 有方向可用性
+     sb_A1×dist C_pooled=+0.0390  → 真实 utilization deficit
+
+wrote results/stage_b_h2_poscontrol_alpha.json
+
+[sb_A0] ft_l40_sb_A0/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00025 E_same=0.00069 E_opp=0.00067 E_zero=0.00051 E_shuf=0.00071
+  raw(E_opp-E_same)=-1.68e-05  c_persist=+0.0122  Rout=0.01685 (fg=0.03937)
+  usage_zero=+0.3118 usage_shuf=+1.0993  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.59 (act=9.31 env=0.29)  active_dims=40 (act=32/32)  eff_rank_a=9.6
+       sep(same,opp)/noise=1.945 (sep=1.945 noise=1.000) snr_act_mean=0.540  n_rev_tasks=64
+
+[sb_A1] ft_l40_sb_A1/step_0001000
+  anchors=840 tasks=55 fg_frac=0.105
+  E_own=0.00053 E_same=0.00063 E_opp=0.00063 E_zero=0.00073 E_shuf=0.00063
+  raw(E_opp-E_same)=+2.98e-06  c_persist=-0.0012  Rout=0.01022 (fg=0.01814)
+  usage_zero=+0.5311 usage_shuf=+0.0453  donor d_same<d_opp=0.488 (d_same=2.898 d_opp=2.828)
+  SNR: KL_tot=9.74 (act=9.31 env=0.43)  active_dims=40 (act=32/32)  eff_rank_a=9.6
+       sep(same,opp)/noise=1.946 (sep=1.946 noise=1.000) snr_act_mean=0.541  n_rev_tasks=64
+
+wrote results/stage_b_h2_decompose_alpha.json
+[ALL-EVAL-DONE]

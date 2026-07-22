@@ -1,0 +1,58 @@
+# α ablation arm A1 — decoder-exposure noise ON (decoder_noise_alpha = 1.0, standard reparam).
+# Matched control for sb_A0: identical trunk / schedule / manifest / seed; only α differs.
+# (Numerically equivalent to sb_B's α=1 path; run fresh with the α-knob code so the
+#  A0-vs-A1 pair is a clean matched causal comparison free of any code-drift ambiguity.)
+model:
+  image_channels: 3
+  lam_model_dim: 1024
+  lam_latent_dim: 40
+  lam_patch_size: 16
+  lam_enc_blocks: 24
+  lam_dec_blocks: 24
+  lam_num_heads: 16
+  lam_dropout: 0.0
+  beta: 3.0e-3
+  beta_env: 1.0e-6
+  env_dim: 8
+  action_dim: 18
+  action_head: true
+  lambda_action: 1.0
+  lambda_indep: 0.0
+  lambda_zero: 0.1
+  zero_margin: 0.05
+  decoder_noise_alpha: 1.0     # ← α=1: standard reparam (decoder sees z_mu + σ·ε)
+  init_from: /home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt
+  freeze_encoder: false
+  log_path: /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_sb_A1/log_imgs
+
+data:
+  dataset_type: egodex
+  exclude_manifest: /home/xuan/embodied-ai/lam_condition_utilization/data/eval_manifest.json
+  data_root: /home/xuan/embodied-ai/data/egodex/test_240p
+  img_h: 240
+  img_w: 320
+  downsample_factors: [1, 2]
+  val_ratio: 0.1
+  seed: 42
+  load_actions: true
+
+training:
+  per_gpu_batch_size: 4
+  gradient_accumulation_steps: 4
+  num_workers: 10
+  pin_memory: true
+  total_steps: 1000
+  lr: 1.0e-5
+  weight_decay: 0.01
+  warmup_steps: 200
+  mixed_precision: bf16
+  output_dir: /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_sb_A1
+  save_every: 1000
+  eval_every: 500
+  log_every: 50
+  keep_last_n: 1
+
+logging:
+  project: dreamdojo-lam-disentangle
+  run_name: ft-l40-sb-A1
+  use_wandb: false

@@ -1,0 +1,31 @@
+[device] cuda:0
+[init_from] LAM_400k.ckpt: loaded 839/843 tensors
+[init_from] left random-init (4): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight
+[raw_lam] source=/home/xuan/embodied-ai/checkpoints/pretrained/LAM_400k.ckpt
+[raw_lam] val_size=80,509 latent_dim=32 action_part=32
+[progress] 1 run(s) -> results/lam_benchmark_v2/summary.md
+[kl_ft_l40_full_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_full_5k/step_0005000
+[kl_ft_l40_full_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 2 run(s) -> results/lam_benchmark_v2/summary.md
+[contrastive_v3_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_contrastive_v3_5k/step_0005000
+[contrastive_v3_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 3 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_a_zero_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_a_zero_5k/step_0005000
+[ours_a_zero_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 4 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_b_zero_reverse_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_b_zero_reverse_5k/step_0005000
+[ours_b_zero_reverse_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 5 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_b2_zero_action_reverse_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_b2_zero_action_reverse_5k/step_0005000
+[ours_b2_zero_action_reverse_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 6 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_c_zero_reverse_hardneg_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_c_zero_reverse_hardneg_5k/step_0005000
+[ours_c_zero_reverse_hardneg_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 7 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_r_zero_opposite_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r_zero_opposite_5k/step_0005000
+[ours_r_zero_opposite_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 8 run(s) -> results/lam_benchmark_v2/summary.md
+[ours_r2_opp_l01_5k] source=/home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_ours_r2_opp_l01_5k/step_0005000
+[ours_r2_opp_l01_5k] val_size=80,509 latent_dim=40 action_part=32
+[progress] 9 run(s) -> results/lam_benchmark_v2/summary.md
+[done] wrote results/lam_benchmark_v2/summary.md and per-dim CSVs

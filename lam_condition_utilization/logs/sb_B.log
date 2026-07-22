@@ -1,0 +1,40 @@
+The following values were not passed to `accelerate launch` and had defaults used instead:
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--num_machines` was set to a value of `1`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+latent_dim=40 action_part=32 env_dim=8 | action_head=True (lambda_action=1.0) | indep=False (lambda_indep=0.0) | split_kl=True (beta_a=0.003, beta_e=1e-06) | contrastive=False (supcon=0.0, temporal=0.0, tau=0.1) | causal(zero=0.1, reverse=0.0, hardneg=0.0, opposite=0.0, pctr=0.0) | recon=1.0 | use=0.0 | dir=0.0
+Model params: 709.8M
+[init_from] LAM_400k.ckpt: loaded 836/843 tensors
+[init_from] shape-mismatch skipped (3): fc.weight(64, 1024)->(80, 1024), fc.bias(64,)->(80,), action_up.weight(1024, 32)->(1024, 40)
+[init_from] left random-init (7): action_predictor.0.bias, action_predictor.0.weight, action_predictor.2.bias, action_predictor.2.weight, action_up.weight, fc.bias, fc.weight
+[manifest] excluding frozen eval episodes: /home/xuan/embodied-ai/lam_disentangle/data/eval_manifest.json
+Train pairs: 624,133  Val pairs: 80,509
+[lr] warmup=200 total=1000 num_processes=2 (schedule expressed in global steps)
+Starting training from step 0 -> 1000
+step     50 | loss 1.4094 | mse 0.0055 | kl 3.575838 | act 1.3610 | zero 0.3415 | lr 2.50e-06
+step    100 | loss 1.0816 | mse 0.0019 | kl 2.481931 | act 1.0728 | zero 0.0104 | lr 5.00e-06
+step    150 | loss 1.9639 | mse 0.0014 | kl 3.746619 | act 1.9508 | zero 0.0198 | lr 7.50e-06
+step    200 | loss 0.8654 | mse 0.0011 | kl 5.399232 | act 0.8466 | zero 0.0319 | lr 1.00e-05
+step    250 | loss 0.8979 | mse 0.0011 | kl 7.789345 | act 0.8729 | zero 0.0237 | lr 9.90e-06
+step    300 | loss 0.5740 | mse 0.0010 | kl 9.587431 | act 0.5410 | zero 0.0530 | lr 9.62e-06
+step    350 | loss 0.8691 | mse 0.0008 | kl 11.123028 | act 0.8323 | zero 0.0456 | lr 9.16e-06
+step    400 | loss 0.7333 | mse 0.0009 | kl 13.309841 | act 0.6918 | zero 0.0273 | lr 8.54e-06
+step    450 | loss 0.7045 | mse 0.0009 | kl 15.035412 | act 0.6574 | zero 0.0328 | lr 7.78e-06
+step    500 | loss 1.1941 | mse 0.0011 | kl 19.213200 | act 1.1366 | zero 0.0120 | lr 6.91e-06
+[val] step    500 | loss 0.0419 | mse 0.0010 | psnr 29.80 dB
+step    550 | loss 0.9709 | mse 0.0009 | kl 14.082384 | act 0.9289 | zero 0.0110 | lr 5.98e-06
+step    600 | loss 0.8454 | mse 0.0007 | kl 16.261848 | act 0.7965 | zero 0.0148 | lr 5.00e-06
+step    650 | loss 1.2208 | mse 0.0009 | kl 18.174345 | act 1.1670 | zero 0.0064 | lr 4.02e-06
+step    700 | loss 1.4039 | mse 0.0008 | kl 18.981861 | act 1.3477 | zero 0.0068 | lr 3.09e-06
+step    750 | loss 1.6543 | mse 0.0008 | kl 15.632333 | act 1.6080 | zero 0.0055 | lr 2.22e-06
+step    800 | loss 0.5207 | mse 0.0008 | kl 14.318250 | act 0.4784 | zero 0.0036 | lr 1.46e-06
+step    850 | loss 0.8375 | mse 0.0008 | kl 15.307016 | act 0.7925 | zero 0.0020 | lr 8.43e-07
+step    900 | loss 0.6459 | mse 0.0007 | kl 14.733363 | act 0.6026 | zero 0.0015 | lr 3.81e-07
+step    950 | loss 0.9236 | mse 0.0008 | kl 18.630407 | act 0.8689 | zero 0.0008 | lr 9.61e-08
+step   1000 | loss 0.9599 | mse 0.0008 | kl 21.344218 | act 0.8972 | zero 0.0016 | lr 0.00e+00
+[val] step   1000 | loss 0.0570 | mse 0.0010 | psnr 29.92 dB
+[save] checkpoint -> /home/xuan/embodied-ai/checkpoints/lam-dis/ft_l40_sb_B/step_0001000
+Training complete.
+[rank0]:[W720 09:13:00.066016575 ProcessGroupNCCL.cpp:1553] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())

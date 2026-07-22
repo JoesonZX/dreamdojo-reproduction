@@ -1,0 +1,23 @@
+{
+  "episodes": 150,
+  "real_rate_mean": 0.30993037080180214,
+  "null_rate_mean": 0.248974248701842,
+  "lift": 1.244829023153145,
+  "dt_anti_median_s": 5.466666666666667,
+  "dt_all_median_s": 5.6,
+  "dt_anti_frac_le2s": 0.2519511141719875,
+  "dt_all_frac_le2s": 0.2504507007080736,
+  "magratio_anti_median": 0.5367302426622076,
+  "magratio_all_median": 0.5397113458901162,
+  "own_cam_agreement": 0.8781596513733014,
+  "own_cam_jaccard": 0.6616715385425116,
+  "_config": {
+    "n_episodes": 150,
+    "skip": 1,
+    "mag_pct": 60.0,
+    "cos_thresh": -0.5,
+    "fps": 30.0,
+    "seed": 42,
+    "out": "results/dir_pair_audit2.json"
+  }
+}

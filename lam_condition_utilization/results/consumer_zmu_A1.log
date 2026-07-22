@@ -1,0 +1,45 @@
+train clips=800  dev clips=100  K=8 skip=3 cond=zmu
+cached train (800, 9, 240, 320, 3) dev (100, 9, 240, 320, 3)
+zmu cond arm=sb_A1 dim=32
+consumer params=8.6M
+step     1 L1w=0.0273 | h1 endpoint tgt=2.599 shuf=2.605 anti=2.604 zero=2.596 | h1 dir_cos tgt=+0.082 shuf=+0.074 anti=+0.041 | h8 dir_cos tgt=+0.085 anti=+0.031
+step   250 L1w=0.0170 | h1 endpoint tgt=2.585 shuf=2.597 anti=2.594 zero=2.589 | h1 dir_cos tgt=+0.175 shuf=+0.087 anti=+0.058 | h8 dir_cos tgt=+0.146 anti=+0.101
+step   500 L1w=0.0273 | h1 endpoint tgt=2.644 shuf=2.801 anti=2.858 zero=2.658 | h1 dir_cos tgt=+0.256 shuf=+0.107 anti=+0.008 | h8 dir_cos tgt=+0.125 anti=+0.131
+step   750 L1w=0.0258 | h1 endpoint tgt=2.581 shuf=2.934 anti=2.958 zero=2.675 | h1 dir_cos tgt=+0.255 shuf=+0.109 anti=-0.019 | h8 dir_cos tgt=+0.129 anti=+0.018
+step  1000 L1w=0.0258 | h1 endpoint tgt=2.726 shuf=3.097 anti=3.283 zero=2.774 | h1 dir_cos tgt=+0.283 shuf=+0.077 anti=-0.106 | h8 dir_cos tgt=+0.180 anti=+0.068
+step  1250 L1w=0.0187 | h1 endpoint tgt=2.532 shuf=3.016 anti=3.161 zero=2.734 | h1 dir_cos tgt=+0.340 shuf=+0.125 anti=-0.082 | h8 dir_cos tgt=+0.170 anti=+0.098
+step  1500 L1w=0.0192 | h1 endpoint tgt=2.345 shuf=3.049 anti=3.286 zero=2.701 | h1 dir_cos tgt=+0.394 shuf=+0.108 anti=-0.101 | h8 dir_cos tgt=+0.198 anti=+0.040
+step  1750 L1w=0.0191 | h1 endpoint tgt=2.318 shuf=2.968 anti=3.102 zero=2.631 | h1 dir_cos tgt=+0.420 shuf=+0.101 anti=-0.212 | h8 dir_cos tgt=+0.185 anti=-0.049
+step  2000 L1w=0.0343 | h1 endpoint tgt=2.280 shuf=3.178 anti=3.774 zero=2.779 | h1 dir_cos tgt=+0.451 shuf=+0.082 anti=-0.218 | h8 dir_cos tgt=+0.264 anti=-0.013
+step  2250 L1w=0.0184 | h1 endpoint tgt=2.323 shuf=3.091 anti=3.106 zero=2.603 | h1 dir_cos tgt=+0.428 shuf=+0.103 anti=-0.215 | h8 dir_cos tgt=+0.217 anti=+0.005
+step  2500 L1w=0.0201 | h1 endpoint tgt=2.191 shuf=3.211 anti=3.618 zero=2.709 | h1 dir_cos tgt=+0.524 shuf=+0.095 anti=-0.217 | h8 dir_cos tgt=+0.277 anti=-0.012
+step  2750 L1w=0.0186 | h1 endpoint tgt=2.284 shuf=3.174 anti=3.159 zero=2.619 | h1 dir_cos tgt=+0.470 shuf=+0.086 anti=-0.224 | h8 dir_cos tgt=+0.254 anti=-0.039
+step  3000 L1w=0.0239 | h1 endpoint tgt=2.219 shuf=3.300 anti=3.713 zero=2.658 | h1 dir_cos tgt=+0.522 shuf=+0.034 anti=-0.232 | h8 dir_cos tgt=+0.296 anti=+0.004
+step  3250 L1w=0.0213 | h1 endpoint tgt=2.166 shuf=3.174 anti=3.723 zero=2.602 | h1 dir_cos tgt=+0.535 shuf=+0.073 anti=-0.272 | h8 dir_cos tgt=+0.321 anti=-0.022
+step  3500 L1w=0.0199 | h1 endpoint tgt=2.189 shuf=3.307 anti=3.504 zero=2.646 | h1 dir_cos tgt=+0.542 shuf=+0.057 anti=-0.284 | h8 dir_cos tgt=+0.328 anti=-0.009
+step  3750 L1w=0.0230 | h1 endpoint tgt=2.192 shuf=3.140 anti=3.658 zero=2.595 | h1 dir_cos tgt=+0.527 shuf=+0.100 anti=-0.310 | h8 dir_cos tgt=+0.317 anti=-0.022
+step  4000 L1w=0.0189 | h1 endpoint tgt=2.176 shuf=3.152 anti=3.598 zero=2.633 | h1 dir_cos tgt=+0.544 shuf=+0.049 anti=-0.373 | h8 dir_cos tgt=+0.333 anti=-0.075
+step  4250 L1w=0.0258 | h1 endpoint tgt=2.179 shuf=3.024 anti=3.195 zero=2.575 | h1 dir_cos tgt=+0.552 shuf=+0.075 anti=-0.369 | h8 dir_cos tgt=+0.327 anti=-0.088
+step  4500 L1w=0.0201 | h1 endpoint tgt=2.233 shuf=3.198 anti=3.721 zero=2.619 | h1 dir_cos tgt=+0.544 shuf=+0.070 anti=-0.384 | h8 dir_cos tgt=+0.271 anti=-0.079
+step  4750 L1w=0.0200 | h1 endpoint tgt=2.019 shuf=3.165 anti=3.632 zero=2.559 | h1 dir_cos tgt=+0.581 shuf=+0.082 anti=-0.406 | h8 dir_cos tgt=+0.322 anti=-0.094
+step  5000 L1w=0.0181 | h1 endpoint tgt=2.208 shuf=3.286 anti=3.572 zero=2.594 | h1 dir_cos tgt=+0.536 shuf=+0.057 anti=-0.374 | h8 dir_cos tgt=+0.328 anti=-0.067
+step  5250 L1w=0.0134 | h1 endpoint tgt=2.028 shuf=3.297 anti=3.792 zero=2.592 | h1 dir_cos tgt=+0.584 shuf=+0.039 anti=-0.425 | h8 dir_cos tgt=+0.359 anti=-0.082
+step  5500 L1w=0.0132 | h1 endpoint tgt=1.988 shuf=3.147 anti=3.835 zero=2.582 | h1 dir_cos tgt=+0.574 shuf=+0.075 anti=-0.437 | h8 dir_cos tgt=+0.293 anti=-0.119
+step  5750 L1w=0.0184 | h1 endpoint tgt=2.132 shuf=3.055 anti=3.475 zero=2.592 | h1 dir_cos tgt=+0.573 shuf=+0.083 anti=-0.356 | h8 dir_cos tgt=+0.305 anti=-0.089
+step  6000 L1w=0.0210 | h1 endpoint tgt=2.081 shuf=3.224 anti=3.823 zero=2.679 | h1 dir_cos tgt=+0.601 shuf=+0.061 anti=-0.382 | h8 dir_cos tgt=+0.354 anti=-0.022
+step  6250 L1w=0.0214 | h1 endpoint tgt=2.048 shuf=3.323 anti=3.855 zero=2.645 | h1 dir_cos tgt=+0.601 shuf=+0.049 anti=-0.412 | h8 dir_cos tgt=+0.394 anti=-0.059
+step  6500 L1w=0.0186 | h1 endpoint tgt=2.160 shuf=3.208 anti=3.792 zero=2.601 | h1 dir_cos tgt=+0.581 shuf=+0.052 anti=-0.398 | h8 dir_cos tgt=+0.335 anti=-0.046
+step  6750 L1w=0.0134 | h1 endpoint tgt=2.054 shuf=3.216 anti=3.951 zero=2.682 | h1 dir_cos tgt=+0.636 shuf=+0.047 anti=-0.427 | h8 dir_cos tgt=+0.427 anti=-0.013
+step  7000 L1w=0.0181 | h1 endpoint tgt=2.055 shuf=3.137 anti=3.709 zero=2.609 | h1 dir_cos tgt=+0.616 shuf=+0.074 anti=-0.412 | h8 dir_cos tgt=+0.392 anti=-0.057
+step  7250 L1w=0.0201 | h1 endpoint tgt=2.085 shuf=3.295 anti=3.710 zero=2.588 | h1 dir_cos tgt=+0.591 shuf=+0.083 anti=-0.416 | h8 dir_cos tgt=+0.412 anti=-0.053
+step  7500 L1w=0.0136 | h1 endpoint tgt=1.912 shuf=3.202 anti=3.617 zero=2.554 | h1 dir_cos tgt=+0.623 shuf=+0.063 anti=-0.438 | h8 dir_cos tgt=+0.371 anti=-0.058
+step  7750 L1w=0.0159 | h1 endpoint tgt=2.051 shuf=3.383 anti=3.856 zero=2.645 | h1 dir_cos tgt=+0.618 shuf=+0.015 anti=-0.451 | h8 dir_cos tgt=+0.370 anti=-0.079
+step  8000 L1w=0.0141 | h1 endpoint tgt=2.031 shuf=3.235 anti=3.617 zero=2.607 | h1 dir_cos tgt=+0.605 shuf=+0.042 anti=-0.430 | h8 dir_cos tgt=+0.362 anti=-0.092
+
+GATE (zmu_sb_A1):  [horizons [1, 4, 8]]
+  target       h1: ep=2.031 dc=+0.605  h4: ep=4.892 dc=+0.436  h8: ep=5.897 dc=+0.362
+  shuffle      h1: ep=3.235 dc=+0.042  h4: ep=6.050 dc=+0.111  h8: ep=6.729 dc=+0.139
+  antiparallel h1: ep=3.617 dc=-0.430  h4: ep=6.266 dc=-0.090  h8: ep=7.614 dc=-0.092
+  zero         h1: ep=2.607 dc=+0.095  h4: ep=5.357 dc=+0.079  h8: ep=6.335 dc=+0.013
+  => positive-control gate PASS @h1: dir_cos target +0.605 vs shuffle +0.042 vs antiparallel -0.430; endpoint target 2.031 vs antiparallel 3.617
+wrote results/consumer_zmu_sb_A1_s0.json + results/consumer_zmu_sb_A1_s0.pt

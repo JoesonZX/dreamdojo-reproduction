@@ -1,0 +1,16 @@
+[2026-07-21 07:31:12] object-only re-run of 13 tasks across 1 GPU(s): 0
+  shard 0 -> GPU 0
+[2026-07-21 10:27:15] re-run done.
+=== residual NO-OBJECT per task after re-run:
+     56 insert_remove_furniture_bench_cabinet
+     28 vertical_pick_place
+     19 open_close_insert_remove_tupperware
+     18 insert_remove_plug_socket
+      9 scoop_dump_ice
+      7 wrap_unwrap_food
+      5 insert_remove_utensils
+      3 stack_unstack_tupperware
+      3 insert_remove_shirt_in_tube
+      2 color
+      1 setup_cleanup_table
+      1 boil_serve_egg

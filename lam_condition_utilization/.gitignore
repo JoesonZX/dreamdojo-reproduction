@@ -1,0 +1,4 @@
+# Route-C consumer checkpoints are large binaries (~34 MB each) — keep out of git.
+results/*.pt
+**/__pycache__/
+*.pyc

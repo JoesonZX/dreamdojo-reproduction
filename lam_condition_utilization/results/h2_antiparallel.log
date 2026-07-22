@@ -1,0 +1,35 @@
+pool N=1500  anchors=840
+
+=== donor 方案排序统计(18D 动作:距离 / 余弦 / 幅度比) ===
+  verb         n= 840  d_same=2.371 d_opp=2.350 frac(ds<do)=0.488 | cos_same=+0.181 cos_opp=+0.196 anti_frac=0.068 | mag_s/i=1.00 mag_o/i=1.00
+  dist         n= 840  d_same=1.178 d_opp=4.201 frac(ds<do)=1.000 | cos_same=+0.569 cos_opp=-0.031 anti_frac=0.232 | mag_s/i=0.67 mag_o/i=2.29
+  random       n= 840  d_same=2.309 d_opp=2.468 frac(ds<do)=0.550 | cos_same=+0.211 cos_opp=+0.189 anti_frac=0.102 | mag_s/i=1.00 mag_o/i=1.01
+  antiparallel n= 840  d_same=0.589 d_opp=2.308 frac(ds<do)=1.000 | cos_same=+0.921 cos_opp=-0.547 anti_frac=0.602 | mag_s/i=0.93 mag_o/i=0.97
+
+=== frame-delta ORACLE(已知强可控,无模型)C_pooled ===
+  oracle × verb          C_pooled=+0.0345  (median +0.0234)
+  oracle × dist          C_pooled=+1.1487  (median +0.9845)
+  oracle × random        C_pooled=+0.0645  (median +0.0435)
+  oracle × antiparallel  C_pooled=+0.0578  (median +0.0637)
+
+=== LAM sb_A0(ft_l40_sb_A0)C_pooled ===
+  sb_A0 × verb          C_pooled=-0.0314  (median -0.0101, raw -1.68e-05)
+  sb_A0 × dist          C_pooled=+0.8301  (median +0.7001, raw +4.44e-04)
+  sb_A0 × random        C_pooled=+0.0694  (median +0.0345, raw +3.71e-05)
+  sb_A0 × antiparallel  C_pooled=+0.3807  (median +0.1280, raw +2.04e-04)
+
+=== LAM sb_A1(ft_l40_sb_A1)C_pooled ===
+  sb_A1 × verb          C_pooled=+0.0056  (median -0.0018, raw +2.98e-06)
+  sb_A1 × dist          C_pooled=+0.0390  (median -0.0675, raw +2.09e-05)
+  sb_A1 × random        C_pooled=+0.0140  (median +0.0093, raw +7.48e-06)
+  sb_A1 × antiparallel  C_pooled=+0.0643  (median +0.0382, raw +3.44e-05)
+
+=== 判读(C_pooled)===
+  [MAGNITUDE] oracle×dist=+1.1487, oracle×random=+0.0645
+     sb_A0×dist C_pooled=+0.8301 (72% oracle)  → 有 MAGNITUDE 可用性
+     sb_A1×dist C_pooled=+0.0390 (3% oracle)  → MAGNITUDE deficit
+  [DIRECTION] (frame-delta oracle scene-limited here: +0.0578; perfect-sign ceiling≈4.0)
+     sb_A0×antiparallel C_pooled=+0.3807  (donors: cos_same=+0.92 cos_opp=-0.55 mag_o/i=0.97)
+     sb_A1×antiparallel C_pooled=+0.0643  (donors: cos_same=+0.92 cos_opp=-0.55 mag_o/i=0.97)
+
+wrote results/stage_b_h2_antiparallel.json

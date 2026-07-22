@@ -1,0 +1,19 @@
+[sb_B] ft_l40_sb_B/step_0001000
+  H2: C=+0.0001 n=840 anchors_tasks=55
+[sb_R] ft_l40_sb_R/step_0001000
+  H2: C=-0.0002 n=840 anchors_tasks=55
+[sb_D] ft_l40_sb_D/step_0001000
+  H2: C=-0.0000 n=840 anchors_tasks=55
+[sb_U] ft_l40_sb_U/step_0001000
+  H2: C=-0.0008 n=840 anchors_tasks=55
+[sb_S] ft_l40_sb_S/step_0000300
+  H2: C=+0.0010 n=840 anchors_tasks=55
+
+=== H2 配对对比(ΔC,主对比 D vs R) ===
+  ΔC(sb_D − sb_R) = +0.0005 CI=[-0.0001,+0.0012] (C_a=+0.0001 C_b=-0.0004 anchors=208) n.s.
+  ΔC(sb_D − sb_B) = -0.0004 CI=[-0.0016,+0.0008] (C_a=+0.0001 C_b=+0.0006 anchors=208) n.s.
+  ΔC(sb_R − sb_B) = -0.0010 CI=[-0.0023,+0.0003] (C_a=-0.0004 C_b=+0.0006 anchors=208) n.s.
+  ΔC(sb_U − sb_B) = -0.0038 CI=[-0.0307,+0.0199] (C_a=-0.0033 C_b=+0.0006 anchors=208) n.s.
+  ΔC(sb_S − sb_R) = +0.0007 CI=[-0.0029,+0.0039] (C_a=+0.0003 C_b=-0.0004 anchors=208) n.s.
+
+wrote results/stage_b_eval.json (skip_h1=True skip_h2=False)
